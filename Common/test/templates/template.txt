@@ -1,0 +1,17 @@
+from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_("General")
+config.General.requestName = '$PROCESS$_$CHANNEL$_$FEATURE$'
+config.General.workArea = 'crab_projects'
+config.section_("JobType")
+config.JobType.pluginName = 'Analysis'
+config.JobType.psetName = '$CONFIGFILENAME$'
+config.section_("Data")
+config.Data.inputDataset = '$SAMPLE$'
+config.Data.inputDBS = 'global'
+config.Data.splitting = '$JOBSplitting$'
+config.Data.unitsPerJob = $UNITSPERJOB$
+$IsData$
+config.Data.publication = False
+config.section_("Site")
+config.Site.storageSite = 'T2_DE_DESY'
