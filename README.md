@@ -1,4 +1,4 @@
-aTGC Anlysis
+aTGC Analysis
 ========
 
 ```
