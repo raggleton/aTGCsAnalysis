@@ -1,4 +1,4 @@
-Instructions to setup the aTGC analysis code
+aTGC Anlysis
 ========
 
 ```
