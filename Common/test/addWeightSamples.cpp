@@ -87,13 +87,13 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
 void addWeightSamples()
 {
   double lumi = 36459.;
-  std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_20170410/";
+  std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_20170503/"
 
   //electron channel
-  /*addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
+  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
-  //addWeight(prefix + "t-ch_ele.root", 216.99*0.33, lumi, "ele");
+  addWeight(prefix + "t-ch_ele.root", 216.99*0.33, lumi, "ele");
   addWeight(prefix + "tW-ch-top_ele.root", 35.6, lumi, "ele");
   addWeight(prefix + "tW-ch-antitop_ele.root", 35.6, lumi, "ele");
   addWeight(prefix + "WJets_Ht100To200_ele.root", 1345.0*1.21, lumi, "ele");
@@ -103,13 +103,13 @@ void addWeightSamples()
   addWeight(prefix + "WJets_Ht800To1200_ele.root", 5.501*1.21, lumi, "ele");
   addWeight(prefix + "WJets_Ht1200To2500_ele.root", 1.329*1.21, lumi, "ele"); 
   addWeight(prefix + "WJets_Ht2500ToInf_ele.root", 0.03216*1.21, lumi, "ele"); 
-  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele"); */
+  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele"); 
+  
   //muon channel
-
   addWeight(prefix + "WW_mu.root", 49.997, lumi, "");
   addWeight(prefix + "WZ_mu.root", 11.46, lumi, "");
   addWeight(prefix + "s-ch_mu.root", 10.32*0.33, lumi,"");
-  //addWeight(prefix + "t-ch_mu.root", 216.99*0.33, lumi,""); 
+  addWeight(prefix + "t-ch_mu.root", 216.99*0.33, lumi,""); 
   addWeight(prefix + "tW-ch-top_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "tW-ch-antitop_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "WJets_Ht100To200_mu.root", 1345.0*1.21, lumi,""); 
