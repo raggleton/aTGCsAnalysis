@@ -103,4 +103,4 @@ def Retrieval(feature, outDir):
 		RetrieveTask(TaskName + "_ele_" + feature, OutName + "_ele", outDir )
 
 
-Retrieval("my_feature", "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_20170503/" )
+Retrieval("my_feature", "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/" )

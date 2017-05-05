@@ -53,4 +53,4 @@ cd Plotting
   --wantToWriteHists    to write histograms to the local file
 
 An example below makes plots in the ttbar control region in the electron channel with data, Monte-Carlo, signal and no systematics :
-./draw --CR ttbar --channel ele --output ttbar_CR --input /afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_20170410/ --withSignal --withMC --withData
+./draw --CR ttbar --channel ele --output ttbar_CR --input /afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/ --withSignal --withMC --withData
