@@ -21,7 +21,7 @@ process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
 process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
 
-process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
