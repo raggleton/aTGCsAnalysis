@@ -1446,13 +1446,13 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     totWeight_LeptonIDDown = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF_ID_Down*LeptonSF_trigger*btagWeight*VTagSF; 
   }
   //probably would leave it like that if we keep reweighting to data trigger efficiency in electron channel. In this case lepton ID & trigger scale factors are set to unity in the electron channel.
-  if (isMC&&channel=="el"){
+  /*if (isMC&&channel=="el"){
     totWeight *=  triggerWeightHLTEle27NoER;
     totWeight_BTagUp *= triggerWeightHLTEle27NoER;
     totWeight_BTagDown *= triggerWeightHLTEle27NoER;
     totWeight_MistagUp *= triggerWeightHLTEle27NoER; 
     totWeight_MistagDown *= triggerWeightHLTEle27NoER;
-  }
+  }*/
  
   outTree_->Fill();
 
