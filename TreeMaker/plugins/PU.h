@@ -1,9 +1,11 @@
+// For information see PUTrueDistProducer/doc/PUReweighting.txt
+
 #ifndef PU_H
 #define PU_H
  std::vector<float> PU_data, PU_MC;
 
- /* pileup is extracted with command (72 mb):
- * pileupCalc.py -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 72000 --maxPileupBin 50 --numPileupBins 50 MyDataPileupHistogram.root
+ /* Pileup is extracted with command:
+ * pileupCalc.py -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt --inputLumiJSON /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/PileUp/pileup_latest.txt --calcMode true --minBiasXsec 69200 --maxPileupBin 75 --numPileupBins 75 MyDataPileupHistogram.root
  */
 float PU_data_f[50] = {
 					4.07905981095e-07 ,
@@ -142,12 +144,12 @@ float PU_MC_f[75] =
 };
 
 std::vector<float> MC_dist(){ 
-	for (unsigned int iPU = 0; iPU < 52; iPU++){
+	for (unsigned int iPU = 0; iPU < 75; iPU++){
 		PU_MC.push_back(PU_MC_f[iPU]);
 	}
 	return PU_MC;};
 std::vector<float> data_dist(){ 
-		for (unsigned int iPU = 0; iPU < 52; iPU++){
+		for (unsigned int iPU = 0; iPU < 75; iPU++){
 		PU_data.push_back(PU_data_f[iPU]);
 	}
 	return PU_data;};
