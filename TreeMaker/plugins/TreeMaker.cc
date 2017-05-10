@@ -355,7 +355,7 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     outTree_->Branch("bit_HLT_Ele_115",       &bit_HLT_Ele_115,     "bit_HLT_Ele_115/B"          );
     outTree_->Branch("bit_HLT_Ele_30",       &bit_HLT_Ele_30,     "bit_HLT_Ele_30/B"          );
     outTree_->Branch("bit_HLT_Ele_50_Jet_165",       &bit_HLT_Ele_50_Jet_165,     "bit_HLT_Ele_50_Jet_165/B"          );
-    outTree_->Branch("bit_HLT_BOTH_115_165",       &bit_HLT_BOTH_115_165,     "bit_HLT_BOTH_115_165/B"          );
+    outTree_->Branch("bit_BOTH_115_165",       &bit_BOTH_115_165,     "bit_BOTH_115_165/B"          );
   }
   
   //number of loose leptons
