@@ -178,7 +178,7 @@ private:
 
   std::vector<double> PDFWeights;
   std::vector<double> ScaleWeights;
-  bool bit_HLT_Ele_105, bit_HLT_Ele_27;
+  bool bit_HLT_Ele_105, bit_HLT_Ele_27, bit_HLT_Ele_45, bit_HLT_Ele_115, bit_HLT_Ele_30, bit_HLT_Ele_50_Jet_165, bit_BOTH_115_165;
   double triggerWeightHLTEle27NoER;
   
   
@@ -351,6 +351,11 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   if (channel == "el") {
     outTree_->Branch("bit_HLT_Ele_105",       &bit_HLT_Ele_105,     "bit_HLT_Ele_105/B"          );
     outTree_->Branch("bit_HLT_Ele_27",       &bit_HLT_Ele_27,     "bit_HLT_Ele_27/B"          );
+    outTree_->Branch("bit_HLT_Ele_45",       &bit_HLT_Ele_45,     "bit_HLT_Ele_45/B"          );
+    outTree_->Branch("bit_HLT_Ele_115",       &bit_HLT_Ele_115,     "bit_HLT_Ele_115/B"          );
+    outTree_->Branch("bit_HLT_Ele_30",       &bit_HLT_Ele_30,     "bit_HLT_Ele_30/B"          );
+    outTree_->Branch("bit_HLT_Ele_50_Jet_165",       &bit_HLT_Ele_50_Jet_165,     "bit_HLT_Ele_50_Jet_165/B"          );
+    outTree_->Branch("bit_HLT_BOTH_115_165",       &bit_HLT_BOTH_115_165,     "bit_HLT_BOTH_115_165/B"          );
   }
   
   //number of loose leptons
@@ -1433,8 +1438,14 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
         if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele105_CaloIdVT_GsfTrkIdT_v") ) bit_HLT_Ele_105 = Triggers -> accept(iTrig);
         if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele27_WPLoose_Gsf_v") )  bit_HLT_Ele_27 =  Triggers -> accept(iTrig);
+	if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele45_WPLoose_Gsf_v") )  bit_HLT_Ele_45 =  Triggers -> accept(iTrig);
+	if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele115_CaloIdVT_GsfTrkIdT_v") )  bit_HLT_Ele_115 =  Triggers -> accept(iTrig);
+	if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele30_WPTight_Gsf_v") )  bit_HLT_Ele_30 =  Triggers -> accept(iTrig);
+	if( boost::algorithm::contains(names.triggerName(iTrig), "HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v") )  bit_HLT_Ele_50_Jet_165 =  Triggers -> accept(iTrig);
      }
    }
+  if(bit_HLT_Ele_115 && bit_HLT_Ele_50_Jet_165) bit_BOTH_115_165 = 1;
+
 
   if (isMC) {
     totWeight = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF_ID*LeptonSF_trigger*btagWeight*VTagSF; 
