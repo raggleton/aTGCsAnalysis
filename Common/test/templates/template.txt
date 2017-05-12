@@ -14,4 +14,5 @@ config.Data.unitsPerJob = $UNITSPERJOB$
 $IsData$
 config.Data.publication = False
 config.section_("Site")
+#config.User.voGroup = 'dcms'
 config.Site.storageSite = 'T2_DE_DESY'
