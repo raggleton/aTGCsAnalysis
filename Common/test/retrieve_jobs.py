@@ -87,11 +87,11 @@ TaskDictionaryName = {
 
 #	"data-RunB_ver2":"data-RunB_ver2",
 #	"data-RunC":"data-RunC",
-#	"data-RunD":"data-RunD",
+	"data-RunD":"data-RunD",
 #	"data-RunE":"data-RunE",
 #	"data-RunF":"data-RunF",
-#	"data-RunG":"data-RunG",
-#	"data-RunH_ver2":"data-RunH_ver2",
+###	"data-RunG":"data-RunG",
+###	"data-RunH_ver2":"data-RunH_ver2",
 #	"data-RunH_ver3":"data-RunH_ver3"
 }
 
