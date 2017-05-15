@@ -31,7 +31,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 
 	var.VarName = "nPV";
 	var.Title = "n_{PV}";
-	var.SetRange(0., 30.);
+	var.SetRange(0., 75.);
 	variables.push_back(var);
 	
 	var.VarName = "l_pt";
@@ -56,7 +56,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 
 	var.VarName = "jet2_pt";
 	var.Title = "p_{T, jet}";
-	var.SetRange(30., 100.);
+	var.SetRange(30., 20.);
 	variables.push_back(var);
 
 	var.VarName = "jet2_btag";
