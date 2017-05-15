@@ -238,14 +238,23 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
 {
   //loading JEC from text files, this is done because groomed mass should be corrected with L2L3 corrections, if this is temporary, that shouldn't be done, as we take corrections from GT
-  edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
+  /*edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt");
   
 
   edm::FileInPath L1Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L1FastJet_AK8PFchs.txt");
   edm::FileInPath L2Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L3Absolute_AK8PFchs.txt");
-  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"); 
+  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"); */
+
+  edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt");
+  edm::FileInPath L3MC("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_MC_L3Absolute_AK8PFchs.txt");
+
+  edm::FileInPath L1Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L1FastJet_AK8PFchs.txt");
+  edm::FileInPath L2Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L2Relative_AK8PFchs.txt");
+  edm::FileInPath L3Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt");
+  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L2L3Residual_AK8PFchs.txt");
+
   std::vector<std::string> jecAK8PayloadNamesMC_L2L3_,jecAK8PayloadNamesData_L2L3_;
   
   if (isMC){
