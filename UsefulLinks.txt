@@ -1,0 +1,42 @@
+Useful Links for aTGC Analysis
+==============================
+
+# aTGC Analysis Note
+https://cds.cern.ch/record/2209148
+
+# Ivan's Thesis
+https://www.dropbox.com/s/obga6gcfwnte0if/thesis_draft.pdf?dl=0
+
+# GridKA Certificate
+https://gridka-ca.kit.edu/
+
+# NAF Servers
+http://it.desy.de/services/computing_infrastructure/national_analysis_facility___naf/index_eng.html
+
+# MiniAOD2016 Analysis Documentation
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2016
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD
+
+# Trigger Evolution Page
+http://dmytro.web.cern.ch/dmytro/trigger/triggerEvolution_all.html
+
+# Global Tags
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Global_Tags_for_2016_data_taking
+
+# Pileup Reweighting
+https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData#2015_Pileup_JSON_Files
+https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2016Analysis
+
+# Luminosity POG
+https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM
+
+# Jet W/Z Tagging (JECs PUPPI and CHS)
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC#Jet_Energy_Corrections_in_Run2
+
+# Combined Limit Tool
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit
+
+# Anomalous Coupling Limit Tool
+https://twiki.cern.ch/twiki/bin/view/CMS/ATGCRooStats
+
