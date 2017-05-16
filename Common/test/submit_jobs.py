@@ -14,11 +14,11 @@ def DefineNJobs(sample):
 			replacedline = line.replace("count(file.name)=","")
 	N = int(replacedline)
 	
-	if N < 100 :
+	if N < 250 :
 		NFilesPerJob = 1
 	else :
 		# let's roughly assume that number of files is ~1000 in the worst case
-		NFilesPerJob = int(N/100)
+		NFilesPerJob = int(N/250)
 	print "N of files per job : " , sample , " " , NFilesPerJob	
 	return NFilesPerJob
 
@@ -135,10 +135,10 @@ parser.add_option('-p', '--Feature', dest="Feature", default='my_feature')
 
 
 def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDictionaryElectronChannel, DataDictionaryMuonChannel, JSONFile, YourRunRange,wantToSubmit=False):
-#	for key in MCBackgroundsSampleDictionary:
-#		ConfigFileName = createConfigFile(key, "mu", True, False)
-#		print key, " ", ConfigFileName
-#		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
+	for key in MCBackgroundsSampleDictionary:
+		ConfigFileName = createConfigFile(key, "mu", True, False)
+		print key, " ", ConfigFileName
+		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 #		ConfigFileName = createConfigFile(key, "ele", True, False)
 #		createFileForJob(key, "ele", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 #	for key in SignalMCSampleDictionary:
@@ -146,9 +146,9 @@ def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDict
 #		createFileForJob(key, "mu", SignalMCSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, True, wantToSubmit)
 #		ConfigFileName = createConfigFile(key, "ele", True, True)
 #		createFileForJob(key, "ele", SignalMCSampleDictionary[key], options.Feature, ConfigFileName, "crabConfigs", JSONFile, YourRunRange, True, True, wantToSubmit)
-	for key in DataDictionaryElectronChannel:
-		ConfigFileName = createConfigFile(key, "ele", False, False)
-		createFileForJob(key, "ele", DataDictionaryElectronChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
+#	for key in DataDictionaryElectronChannel:
+#		ConfigFileName = createConfigFile(key, "ele", False, False)
+#		createFileForJob(key, "ele", DataDictionaryElectronChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
 	for key in DataDictionaryMuonChannel:
 		ConfigFileName = createConfigFile(key, "mu", False, False)
 		createFileForJob(key, "mu", DataDictionaryMuonChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
@@ -198,19 +198,18 @@ SignalMCSampleDictionary ={
 	'WZ-signal':'/WZToLNu2QorQQ2L_aTGC_13TeV-madgraph-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM'}
 
 DataDictionaryMuonChannel = {
-	'data-RunB_ver1':'/SingleMuon/Run2016B-03Feb2017_ver1-v1/MINIAOD'
-#	'data-RunB_ver2':'/SingleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD',
-#	'data-RunC':'/SingleMuon/Run2016C-03Feb2017-v1/MINIAOD',
-#	'data-RunD':'/SingleMuon/Run2016D-03Feb2017-v1/MINIAOD',
-#	'data-RunE':'/SingleMuon/Run2016E-03Feb2017-v1/MINIAOD',
-#	'data-RunF':'/SingleMuon/Run2016F-03Feb2017-v1/MINIAOD',
-#	'data-RunG':'/SingleMuon/Run2016G-03Feb2017-v1/MINIAOD',
-#	'data-RunH_ver2':'/SingleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD',
-#	'data-RunH_ver3':'/SingleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD'
-}
+#	'data-RunB_ver1':'/SingleMuon/Run2016B-03Feb2017_ver1-v1/MINIAOD'
+	'data-RunB_ver2':'/SingleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD',
+	'data-RunC':'/SingleMuon/Run2016C-03Feb2017-v1/MINIAOD',
+	'data-RunD':'/SingleMuon/Run2016D-03Feb2017-v1/MINIAOD',
+	'data-RunE':'/SingleMuon/Run2016E-03Feb2017-v1/MINIAOD',
+	'data-RunF':'/SingleMuon/Run2016F-03Feb2017-v1/MINIAOD',
+	'data-RunG':'/SingleMuon/Run2016G-03Feb2017-v1/MINIAOD',
+	'data-RunH_ver2':'/SingleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD',
+	'data-RunH_ver3':'/SingleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD'}
 
-DataDictionaryElectronChannel = {
-	'data-RunB_ver1':'/SingleElectron/Run2016B-03Feb2017_ver1-v1/MINIAOD'
+DataDictionaryElectronChannel = {}
+#	'data-RunB_ver1':'/SingleElectron/Run2016B-03Feb2017_ver1-v1/MINIAOD'
 #	'data-RunB_ver2':'/SingleElectron/Run2016B-03Feb2017_ver2-v2/MINIAOD',
 #	'data-RunC':'/SingleElectron/Run2016C-03Feb2017-v1/MINIAOD',
 #	'data-RunD':'/SingleElectron/Run2016D-03Feb2017-v1/MINIAOD',
@@ -218,8 +217,7 @@ DataDictionaryElectronChannel = {
 #	'data-RunF':'/SingleElectron/Run2016F-03Feb2017-v1/MINIAOD',
 #	'data-RunG':'/SingleElectron/Run2016G-03Feb2017-v1/MINIAOD',
 #	'data-RunH_ver2':'/SingleElectron/Run2016H-03Feb2017_ver2-v1/MINIAOD',
-#	'data-RunH_ver3':'/SingleElectron/Run2016H-03Feb2017_ver3-v1/MINIAOD'
-}
+#	'data-RunH_ver3':'/SingleElectron/Run2016H-03Feb2017_ver3-v1/MINIAOD'}
 	
 MyJSON = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt"
 	
