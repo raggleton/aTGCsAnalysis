@@ -1,5 +1,5 @@
-# This is a script to kill all jobs of all tasks in crab_projects directory.
 #!/bin/bash
+# This is a script to kill all jobs of all tasks in crab_projects directory.
 
 tasks=./crab_projects/*
 iter=0
@@ -10,5 +10,5 @@ do
 	echo "$iter"
 	echo "Sending kill request for $taskName"
 	crab kill -d $taskName
-	echo "  "
+	echo
 done
