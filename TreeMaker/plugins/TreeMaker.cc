@@ -800,7 +800,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParCollAK8;
-  if (isMC) {
+  /*if (isMC) {
     iSetup.get<JetCorrectionsRecord>().get("AK8PFchs",JetCorParCollAK8);
 
     JetCorrectorParameters const & JetCorPar = (*JetCorParCollAK8)["Uncertainty"];
@@ -810,7 +810,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     JECunc = jecUnc->getUncertainty(true);
   }
-  else JECunc = 0.;
+  else JECunc = 0.;*/JECunc=0.;
  
       
    //  Defining decay channel on the gen level
