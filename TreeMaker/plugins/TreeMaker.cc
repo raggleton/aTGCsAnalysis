@@ -84,7 +84,8 @@ private:
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endRun(edm::Run const& iEvent, edm::EventSetup const&) override;
   virtual void endJob() override;
-  
+  virtual float getPUPPIweight(float, float); 
+ 
   // ----------member data ---------------------------
   TTree* outTree_;
 
@@ -93,6 +94,7 @@ private:
   
   //number of primary vertices
   int nPV;
+  double gnPV;
 
   double PUweight;
   double btagWeight, btagWeight_BTagUp, btagWeight_BTagDown, btagWeight_MistagUp, btagWeight_MistagDown;
@@ -209,7 +211,8 @@ private:
   //for JEC
   boost::shared_ptr<FactorizedJetCorrector> jecAK8MC_L2L3_, jecAK8Data_L2L3_;
   BTagHelper BTagHelper_;
-  
+  // For PUPPI Softdrop Mass Correction
+  TF1 *puppisd_corrGEN, *puppisd_corrRECO_cen, *puppisd_corrRECO_for;
 
 
 };
@@ -238,22 +241,29 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
 {
   //loading JEC from text files, this is done because groomed mass should be corrected with L2L3 corrections, if this is temporary, that shouldn't be done, as we take corrections from GT
-  /*edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
+  edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3MC("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt");
   
 
   edm::FileInPath L1Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L1FastJet_AK8PFchs.txt");
   edm::FileInPath L2Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3Data("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L3Absolute_AK8PFchs.txt");
-  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt"); */
+  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Summer16_23Sep2016BCDV4_DATA_L2L3Residual_AK8PFchs.txt");
 
-  edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt");
+  /*edm::FileInPath L2MC("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3MC("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_MC_L3Absolute_AK8PFchs.txt");
 
   edm::FileInPath L1Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L1FastJet_AK8PFchs.txt");
   edm::FileInPath L2Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L2Relative_AK8PFchs.txt");
   edm::FileInPath L3Data("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt");
-  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L2L3Residual_AK8PFchs.txt");
+  edm::FileInPath L2L3ResData("aTGCsAnalysis/TreeMaker/data/Spring16_25nsV3_DATA_L2L3Residual_AK8PFchs.txt");*/
+
+  // For PUPPI Correction
+  edm::FileInPath puppiCorr("aTGCsAnalysis/TreeMaker/data/puppiCorrSummer16.root");
+  TFile* file = TFile::Open( puppiCorr.fullPath().c_str(),"READ");
+  puppisd_corrGEN      = (TF1*)file->Get("puppiJECcorr_gen");
+  puppisd_corrRECO_cen = (TF1*)file->Get("puppiJECcorr_reco_0eta1v3");
+  puppisd_corrRECO_for = (TF1*)file->Get("puppiJECcorr_reco_1v3eta2v5");
 
   std::vector<std::string> jecAK8PayloadNamesMC_L2L3_,jecAK8PayloadNamesData_L2L3_;
   
@@ -316,6 +326,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("rho",       &rho_,     "rho/D"          );
   //PUweight
   if (isMC) {
+     outTree_->Branch("gnPV", &gnPV, "gnPV/D");
+
      outTree_->Branch("puweight",       &PUweight,     "puweight/D"          );
      outTree_->Branch("LeptonSF_ID",       &LeptonSF_ID,     "LeptonSF_ID/D"          );
      outTree_->Branch("LeptonSF_ID_Up",       &LeptonSF_ID_Up,     "LeptonSF_ID_Up/D"          );
@@ -705,6 +717,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      }
 
     }
+    gnPV=Tnpv;
     PUweight = LumiWeights_.weight( Tnpv );
 
    iEvent.getByToken( genInfoToken , genInfo);
@@ -882,8 +895,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       LeptonSF_ID = ScaleFactorHelper_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), "mu", "ID");
       LeptonSF_ID_Up = ScaleFactorHelper_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), "mu", "ID", "up");
       LeptonSF_ID_Down = ScaleFactorHelper_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), "mu", "ID", "down");
-      //LeptonSF_trigger = ScaleFactorHelper_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), "mu", "trigger");
-      LeptonSF_trigger = 1.;
+      LeptonSF_trigger = ScaleFactorHelper_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), "mu", "trigger");
+     // LeptonSF_trigger = 1.;
     }
    else if (channel == "el") {
       LeptonSF_ID = isEB?0.994:0.993;//slide 27: https://indico.cern.ch/event/482671/contributions/2154184/attachments/1268166/1878158/HEEP_ScaleFactor_Study_v4.pdf
@@ -1223,10 +1236,11 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     auto const & sdSubjetsPuppi = jets->at(0).subjets("SoftDropPuppi");
     for ( auto const & it : sdSubjetsPuppi ) 
     {
-      puppi_softdrop_subjet.SetPtEtaPhiM(it->pt(),it->eta(),it->phi(),it->mass());
+      puppi_softdrop_subjet.SetPtEtaPhiM(it->correctedP4(0).pt(),it->correctedP4(0).eta(),it->correctedP4(0).phi(),it->correctedP4(0).mass());
       puppi_softdrop+=puppi_softdrop_subjet;
     }
-    jet_mass_softdrop_PUPPI = puppi_softdrop.M();
+    float puppiCorr= getPUPPIweight( jet_pt_PUPPI, jet_eta_PUPPI );
+    jet_mass_softdrop_PUPPI = puppi_softdrop.M() /** puppiCorr*/;
     jet_tau21_DT = jet_tau21_PUPPI + 0.063*std::log(jet_pt_PUPPI*jet_pt_PUPPI/jet_mass_PUPPI);
 
     if(isMC)
@@ -1480,6 +1494,25 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 }
 
+float TreeMaker::getPUPPIweight(float puppipt, float puppieta){
+
+  float genCorr  = 1.;
+  float recoCorr = 1.;
+  float totalWeight = 1.;
+        
+  genCorr =  puppisd_corrGEN->Eval( puppipt );
+  if( fabs(puppieta)  <= 1.3 ){
+    recoCorr = puppisd_corrRECO_cen->Eval( puppipt );
+  }
+  else{
+    recoCorr = puppisd_corrRECO_for->Eval( puppipt );
+  }
+
+  if(isMC) totalWeight= genCorr * recoCorr;
+  else totalWeight= recoCorr;
+
+  return totalWeight;
+}
 
 void TreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup){
 

@@ -44,7 +44,7 @@ def RetrieveTask(taskName, outputFileName, outDir):
 
 
 TaskDictionaryName = {
-#	"ttbar-powheg": "ttbar",
+	"ttbar-powheg": "ttbar",
 	
 #	"WJets_HT-100To200":"WJets_Ht100To200",
 #	"WJets_HT-100To200-ext1":"WJets_Ht100To200-ext1",
@@ -70,7 +70,7 @@ TaskDictionaryName = {
 #	"WJets_HT-2500ToInf-ext":"WJets_Ht2500ToInf-ext",
 	
 #	"WW":"WW",
-#        "WW-ext":"WW-ext",
+#       "WW-ext":"WW-ext",
 
 #	"WZ":"WZ",
 
@@ -80,18 +80,18 @@ TaskDictionaryName = {
 #	"SingleTop-s-channel":"s-ch",
 
 #	"SingleTop-tW-channel-top": "tW-ch-top",
-#        "SingleTop-tW-channel-antitop": "tW-ch-antitop",
+#	"SingleTop-tW-channel-antitop": "tW-ch-antitop",
 
 #	"WW-signal":"WW-aTGC",
 #	"WZ-signal":"WZ-aTGC",
 
 #	"data-RunB_ver2":"data-RunB_ver2",
 #	"data-RunC":"data-RunC",
-	"data-RunD":"data-RunD",
+#	"data-RunD":"data-RunD",
 #	"data-RunE":"data-RunE",
 #	"data-RunF":"data-RunF",
-###	"data-RunG":"data-RunG",
-###	"data-RunH_ver2":"data-RunH_ver2",
+#	"data-RunG":"data-RunG",
+#	"data-RunH_ver2":"data-RunH_ver2",
 #	"data-RunH_ver3":"data-RunH_ver3"
 }
 
@@ -101,7 +101,7 @@ def Retrieval(feature, outDir):
 
 	for TaskName, OutName in TaskDictionaryName.items():
 		RetrieveTask(TaskName + "_mu_" + feature, OutName + "_mu", outDir)
-		RetrieveTask(TaskName + "_ele_" + feature, OutName + "_ele", outDir )
+#		RetrieveTask(TaskName + "_ele_" + feature, OutName + "_ele", outDir )
 
 
 Retrieval("my_feature", "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/" )

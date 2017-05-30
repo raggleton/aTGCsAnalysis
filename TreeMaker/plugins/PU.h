@@ -84,7 +84,6 @@ float PU_data_f[75] =
 	3.13924013522e-08 ,
 	2.69592990372e-08 ,
 	2.29957546877e-08
-
 };
 
 /* MC distribution is taken from: 
