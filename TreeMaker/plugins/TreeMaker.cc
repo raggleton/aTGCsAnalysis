@@ -1240,7 +1240,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       puppi_softdrop+=puppi_softdrop_subjet;
     }
     float puppiCorr= getPUPPIweight( jet_pt_PUPPI, jet_eta_PUPPI );
-    jet_mass_softdrop_PUPPI = puppi_softdrop.M() /** puppiCorr*/;
+    jet_mass_softdrop_PUPPI = puppi_softdrop.M() * puppiCorr;
     jet_tau21_DT = jet_tau21_PUPPI + 0.063*std::log(jet_pt_PUPPI*jet_pt_PUPPI/jet_mass_PUPPI);
 
     if(isMC)
