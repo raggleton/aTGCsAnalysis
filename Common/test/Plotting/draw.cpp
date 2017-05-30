@@ -194,7 +194,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	}
 	//string addOnCutWjets = defaulCuts +  " * ( (Mjpruned < 65. || Mjpruned > 105. ) && nbtag == 0) ";
 	//string addOnCutTtbar = defaulCuts +  " * (nbtag > 0 )";
-	string addOnCutWjets = defaulCuts +  " * ( (Mjpruned < 65. || Mjpruned > 105. ) && nbtag == 0) ";
+	string addOnCutWjets = defaulCuts +  " * ( (jet_mass_softdrop_PUPPI  < 65. || jet_mass_softdrop_PUPPI > 105. ) && nbtag == 0) ";
         string addOnCutTtbar = defaulCuts +  " * (nbtag > 0 )";
 
 	string signalRegion  ="(jet_pt > 200. && jet_tau2tau1 < 0.6  && Mjpruned < 105. && Mjpruned > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
