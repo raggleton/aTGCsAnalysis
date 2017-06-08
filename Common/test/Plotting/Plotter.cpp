@@ -93,17 +93,19 @@ void Plotter::Plotting(std::string OutPrefix_)
   
   for (uint var_i = 0; var_i < variables.size(); ++ var_i )   {
     
+//  std::cout<<variables.at(var_i).VarName<<"  "<<variables.at(var_i).nBins<<std::endl;
+
     std::string vname = variables.at(var_i).VarName;
     leg[vname] = new TLegend(0.8,0.5,0.98,0.93);
     leg[vname] ->  SetFillColor(kWhite);
     
     if(withData){
-      data[vname] = new TH1D((DataSample.Processname + variables.at(var_i).VarName + "_data").c_str(),(DataSample.Processname + variables.at(var_i).VarName + "_data").c_str(), Nbins,variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      data[vname] = new TH1D((DataSample.Processname + variables.at(var_i).VarName + "_data").c_str(),(DataSample.Processname + variables.at(var_i).VarName + "_data").c_str(), variables.at(var_i).nBins,variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       data[vname] -> Sumw2();
     }
     
     if(withSignal){
-      signalHist[vname] = new TH1D(("signal_" + variables.at(var_i).VarName ).c_str(),("signal_" + variables.at(var_i).VarName ).c_str(), Nbins,variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      signalHist[vname] = new TH1D(("signal_" + variables.at(var_i).VarName ).c_str(),("signal_" + variables.at(var_i).VarName ).c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       signalHist[vname]-> Sumw2();
     }
     
@@ -111,23 +113,23 @@ void Plotter::Plotting(std::string OutPrefix_)
       //for Monte-Carlo samples
       hs[vname] = new THStack("hs",(";"+ vname +";Number of events").c_str());	  
       // sum of all processes for a given variable
-      hist_summed[vname] = new TH1D((vname + "summed").c_str(),( vname+ "summed").c_str(), Nbins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      hist_summed[vname] = new TH1D((vname + "summed").c_str(),( vname+ "summed").c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       hist_summed[vname] -> Sumw2();
     }
     if(withSystematics)
     {
       //PDF Up
-      hist_PDFUp[vname] = new TH1D((vname + "summed_PDFUp").c_str(),( vname+ "summed_PDFUp").c_str(), Nbins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      hist_PDFUp[vname] = new TH1D((vname + "summed_PDFUp").c_str(),( vname+ "summed_PDFUp").c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       hist_PDFUp[vname] -> Sumw2();
       //PDF Down
-      hist_PDFDown[vname] = new TH1D((vname + "summed_PDFDown").c_str(),( vname+ "summed_PDFDown").c_str(), Nbins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      hist_PDFDown[vname] = new TH1D((vname + "summed_PDFDown").c_str(),( vname+ "summed_PDFDown").c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       hist_PDFDown[vname] -> Sumw2();
 
        //Scale Up
-      hist_ScaleUp[vname] = new TH1D((vname + "summed_ScaleUp").c_str(),( vname+ "summed_ScaleUp").c_str(), Nbins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      hist_ScaleUp[vname] = new TH1D((vname + "summed_ScaleUp").c_str(),( vname+ "summed_ScaleUp").c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       hist_ScaleUp[vname] -> Sumw2();
       //PDF Down
-      hist_ScaleDown[vname] = new TH1D((vname + "summed_ScaleDown").c_str(),( vname+ "summed_ScaleDown").c_str(), Nbins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
+      hist_ScaleDown[vname] = new TH1D((vname + "summed_ScaleDown").c_str(),( vname+ "summed_ScaleDown").c_str(), variables.at(var_i).nBins, variables.at(var_i).Range.low, variables.at(var_i).Range.high);
       hist_ScaleDown[vname] -> Sumw2();
       //systematics
       systematics.AddVar( &(variables.at(var_i)) ,  hist_summed[vname]);
@@ -529,7 +531,7 @@ void Plotter::Plotting(std::string OutPrefix_)
     {
       std::string vname = var-> VarName;      
       std::pair<std::string,std::string> key(vname,process);
-      hist_per_process[key] = new TH1D((process + "_" + vname).c_str(),(process + "_" + vname).c_str(), Nbins,var->Range.low, var->Range.high);
+      hist_per_process[key] = new TH1D((process + "_" + vname).c_str(),(process + "_" + vname).c_str(), var->nBins,var->Range.low, var->Range.high);
       hist_per_process[key] -> Sumw2();
     }
     //create histograms for systematics per process
@@ -626,13 +628,13 @@ void Plotter::Plotting(std::string OutPrefix_)
                   //this is a hack that should be disregarded, hack is done to keep the number of PDF variation *exactly* 100
                   if(PDFWeights -> size() == 101 && iPDF == 0) continue;
                   if(PDFWeights -> size() == 102 && (iPDF == 100 || iPDF == 101)) continue;
-                  TH1D *temp = new TH1D(("PDFhist" + var->VarName+ std::to_string(iPDF)).c_str(), ("PDFhist"+  var->VarName + std::to_string(iPDF)).c_str(), Nbins, var ->Range.low, var->Range.high);
+                  TH1D *temp = new TH1D(("PDFhist" + var->VarName+ std::to_string(iPDF)).c_str(), ("PDFhist"+  var->VarName + std::to_string(iPDF)).c_str(), var->nBins, var ->Range.low, var->Range.high);
                   temp -> Sumw2();
                   histsPDFPerFile[var->VarName].push_back(temp);
                 }  
                 for (uint iScale =1; iScale < ScaleWeights -> size(); iScale ++ )
                 {
-                  TH1D *temp = new TH1D(("Scalehist" + var->VarName+ std::to_string(iScale)).c_str(), ("Scalehist"+  var->VarName + std::to_string(iScale)).c_str(), Nbins, var ->Range.low, var->Range.high);
+                  TH1D *temp = new TH1D(("Scalehist" + var->VarName+ std::to_string(iScale)).c_str(), ("Scalehist"+  var->VarName + std::to_string(iScale)).c_str(), var->nBins, var ->Range.low, var->Range.high);
                   temp -> Sumw2();
                   histsScalePerFile[var->VarName].push_back(temp);
                 } 
@@ -822,9 +824,9 @@ void Plotter::Plotting(std::string OutPrefix_)
     }
 
     
-    TH1D *data_dif = new TH1D((vname + "_dif").c_str(),( vname + "_dif").c_str(), Nbins,var->Range.low, var->Range.high);
+    TH1D *data_dif = new TH1D((vname + "_dif").c_str(),( vname + "_dif").c_str(), var->nBins,var->Range.low, var->Range.high);
     data_dif -> Sumw2();
-    TH1D *data_dif_MCerr = new TH1D((vname + "_dif_MCerror").c_str(),( vname + "_dif_MCerror").c_str(), Nbins,var->Range.low, var->Range.high);
+    TH1D *data_dif_MCerr = new TH1D((vname + "_dif_MCerror").c_str(),( vname + "_dif_MCerror").c_str(), var->nBins,var->Range.low, var->Range.high);
     data_dif_MCerr -> Sumw2();
     data_dif_MCerr -> SetFillColor(kGray);
     
@@ -840,7 +842,7 @@ void Plotter::Plotting(std::string OutPrefix_)
     }
     
     
-    for (int iBin = 1; iBin <= Nbins && withMC ; ++iBin)
+    for (int iBin = 1; iBin <= var->nBins && withMC ; ++iBin)
     {
 	       if (hist_summed[vname] -> GetBinContent(iBin) == 0.) {
 	           data_dif_MCerr -> SetBinContent(iBin, 0.);

@@ -22,9 +22,10 @@ struct range
 
 struct Var 
 {
-	string VarName;
+  string VarName;
   string Title;
-	range Range;
+  range Range;
+  int nBins;
   bool logscale;
 
   Double_t value_d;
@@ -35,7 +36,7 @@ struct Var
 
   Double_t value();
 	
-	void SetRange(double xlow, double xhigh);
+  void SetRange(double xlow, double xhigh);
   void Initialize(TTree* tree);
 };
 

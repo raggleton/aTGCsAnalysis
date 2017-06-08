@@ -11,7 +11,7 @@ void Var::SetRange(double xlow, double xhigh)
   Range = RangeX;
 }
 
-  void Var::Initialize(TTree* tree){
+void Var::Initialize(TTree* tree){
   branch = tree->GetBranch(VarName.c_str());
 
   TClass* tc = new TClass();
