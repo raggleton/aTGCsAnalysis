@@ -100,7 +100,7 @@ void addWeightSamples()
   std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/";
 
   //electron channel
-  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
+/*  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
   addWeight(prefix + "t-ch_ele.root", 216.99*0.33, lumi, "ele");
@@ -113,23 +113,23 @@ void addWeightSamples()
   addWeight(prefix + "WJets_Ht800To1200_ele.root", 5.501*1.21, lumi, "ele");
   addWeight(prefix + "WJets_Ht1200To2500_ele.root", 1.329*1.21, lumi, "ele"); 
   addWeight(prefix + "WJets_Ht2500ToInf_ele.root", 0.03216*1.21, lumi, "ele"); 
-  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele"); 
+  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele"); */
   
   //muon channel
-  addWeight(prefix + "WW_mu.root", 49.997, lumi, "");
+/*addWeight(prefix + "WW_mu.root", 49.997, lumi, "");
   addWeight(prefix + "WZ_mu.root", 11.46, lumi, "");
   addWeight(prefix + "s-ch_mu.root", 10.32*0.33, lumi,"");
   addWeight(prefix + "t-ch_mu.root", 216.99*0.33, lumi,""); 
   addWeight(prefix + "tW-ch-top_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "tW-ch-antitop_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "WJets_Ht100To200_mu.root", 1345.0*1.21, lumi,""); 
-  addWeight(prefix + "WJets_Ht200To400_mu.root", 359.7*1.21, lumi,""); 
-  addWeight(prefix + "WJets_Ht400To600_mu.root", 48.91*1.21, lumi,""); 
-  addWeight(prefix + "WJets_Ht600To800_mu.root", 12.05*1.21, lumi,""); 
-  addWeight(prefix + "WJets_Ht800To1200_mu.root", 5.501*1.21, lumi,"");
+  addWeight(prefix + "WJets_Ht200To400_mu.root", 359.7*1.21, lumi,"");
+  addWeight(prefix + "WJets_Ht400To600_mu.root", 48.91*1.21, lumi,""); */
+  addWeight(prefix + "WJets_Ht600To800_mu.root", 12.05*1.21, lumi,"");
+/*  addWeight(prefix + "WJets_Ht800To1200_mu.root", 5.501*1.21, lumi,"");
   addWeight(prefix + "WJets_Ht1200To2500_mu.root", 1.329*1.21, lumi,""); 
   addWeight(prefix + "WJets_Ht2500ToInf_mu.root", 0.03216*1.21, lumi,"");
-  addWeight(prefix + "ttbar_mu.root", 831.76, lumi,""); 
+  addWeight(prefix + "ttbar_mu.root", 831.76, lumi,""); */
   
  
 }
