@@ -18,6 +18,8 @@ hadd t-ch_mu.root $sourceDir"t-ch_mu.root" $sourceDir"t-ch-ext_mu.root"
 echo "s-channel";scp $sourceDir"s-ch_mu.root" .
 echo "tw-top";scp $sourceDir"tW-ch-top_mu.root" .
 echo "tw-antitop";scp $sourceDir"tW-ch-antitop_mu.root" .
+hadd WW-aTGC_mu.root $sourceDir"WW-aTGC_MWW-600To800_mu.root" $sourceDir"WW-aTGC_MWW-800ToInf_mu.root"
+hadd WZ-aTGC_mu.root $sourceDir"WZ-aTGC_MWZ-600To800_mu.root" $sourceDir"WZ-aTGC_MWZ-800ToInf_mu.root"
 hadd data_mu.root $sourceDir"data-RunB_ver2_mu.root" $sourceDir"data-RunC_mu.root" $sourceDir"data-RunD_mu.root" $sourceDir"data-RunE_mu.root" $sourceDir"data-RunF_mu.root" $sourceDir"data-RunG_mu.root" $sourceDir"data-RunH_ver2_mu.root" $sourceDir"data-RunH_ver3_mu.root"
 
 echo "Processing Electron Channel"
@@ -35,4 +37,6 @@ hadd t-ch_ele.root $sourceDir"t-ch_ele.root" $sourceDir"t-ch-ext_ele.root"
 echo "s-channel";scp $sourceDir"s-ch_ele.root" .
 echo "tw-top";scp $sourceDir"tW-ch-top_ele.root" .
 echo "tw-antitop";scp $sourceDir"tW-ch-antitop_ele.root" .
+hadd WW-aTGC_ele.root $sourceDir"WW-aTGC_MWW-600To800_ele.root" $sourceDir"WW-aTGC_MWW-800ToInf_ele.root"
+hadd WZ-aTGC_ele.root $sourceDir"WZ-aTGC_MWZ-600To800_ele.root" $sourceDir"WZ-aTGC_MWZ-800ToInf_ele.root"
 hadd data_ele.root $sourceDir"data-RunB_ver2_ele.root" $sourceDir"data-RunC_ele.root" $sourceDir"data-RunD_ele.root" $sourceDir"data-RunE_ele.root" $sourceDir"data-RunF_ele.root" $sourceDir"data-RunG_ele.root" $sourceDir"data-RunH_ver2_ele.root" $sourceDir"data-RunH_ver3_ele.root"

@@ -266,7 +266,7 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     genInfoToken = mayConsume<GenEventInfoProduct> (iConfig.getParameter<edm::InputTag>( "genInfo" ) );
     LHEEventProductTokenExternal = mayConsume<LHEEventProduct> (iConfig.getParameter<edm::InputTag>( "LHEEventProductSrcExternal" ) );
     if(!isSignal)lheProducerToken = consumes< LHERunInfoProduct, edm::InRun >(edm::InputTag("externalLHEProducer"));
-    else lheProducerToken = consumes< LHERunInfoProduct, edm::InRun >(edm::InputTag("source"));
+    else lheProducerToken = consumes< LHERunInfoProduct, edm::InRun >(edm::InputTag("externalLHEProducer"));
     VTagSF = iConfig.getParameter<double>("VTagSF");
 
    }
@@ -1474,7 +1474,7 @@ void TreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup){
 
 
   if(!isSignal && isMC) iRun.getByLabel( "externalLHEProducer", run );
-  else if (isSignal )iRun.getByLabel( "source", run );
+  else if (isSignal )iRun.getByLabel( "externalLHEProducer", run );
   else return;
   std::cout << "Nominal : " << run->heprup().PDFSUP.first << std::endl;
   NominalPDF = run->heprup().PDFSUP.first;

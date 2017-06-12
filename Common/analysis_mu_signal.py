@@ -19,7 +19,7 @@ process.load("aTGCsAnalysis.Common.leptonicW_cff")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
-process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1'
+process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 
 process.GenWeights = cms.EDAnalyzer("GenWeights",
             genInfo = cms.InputTag("generator"),
@@ -43,7 +43,7 @@ dataFormat = DataFormat.MiniAOD
 switchOnVIDElectronIdProducer(process, dataFormat)
 
 # define which IDs we want to produce
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV61_cff']
+my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff']
 
 #add them to the VID producer
 for idmod in my_id_modules:
@@ -96,7 +96,7 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     looseEleSrc = cms.InputTag("looseElectrons"),
                                     looseMuSrc = cms.InputTag("looseMuons"),
                                     leptonSrc = cms.InputTag("tightMuons"),
-                                    LHEEventProductSrcExternal = cms.InputTag("source"),
+                                    LHEEventProductSrcExternal = cms.InputTag("externalLHEProducer"),
                                     isMC = cms.bool(True),
                                     BtagEffFile = cms.string(""),
                                     isSignal = cms.bool(True),
@@ -115,7 +115,7 @@ process.analysis = cms.Path(process.GenWeights + process.NoiseFilters + process.
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('/store/mc/RunIIFall15MiniAODv2/WWToLNuQQ_aTGC_13TeV-madgraph-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/50000/B64AA5AE-B5B8-E511-80FD-001EC9B21623.root'),    
+    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/signal_mu.root'),    
 )
 
 

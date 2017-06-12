@@ -17,7 +17,7 @@ process.load("aTGCsAnalysis.Common.leptonicW_cff")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
-process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1'
+process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 
 process.GenWeights = cms.EDAnalyzer("GenWeights",
             genInfo = cms.InputTag("generator"),
@@ -42,7 +42,7 @@ dataFormat = DataFormat.MiniAOD
 switchOnVIDElectronIdProducer(process, dataFormat)
 
 # define which IDs we want to produce
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV61_cff']
+my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff']
 
 #add them to the VID producer
 for idmod in my_id_modules:
@@ -96,7 +96,7 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     looseMuSrc = cms.InputTag("looseMuons"),
                                     leptonSrc = cms.InputTag("tightElectrons"),
                                     triggers = cms.InputTag("TriggerResults","","HLT"),
-                                    LHEEventProductSrcExternal = cms.InputTag("source"),
+                                    LHEEventProductSrcExternal = cms.InputTag("externalLHEProducer"),
                                     isMC = cms.bool(True),
                                     BtagEffFile = cms.string(""),
                                     isSignal = cms.bool(True),

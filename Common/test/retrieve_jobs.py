@@ -83,8 +83,10 @@ TaskDictionaryNameUnordered = [
 	("SingleTop-tW-channel-top","tW-ch-top"),
 	("SingleTop-tW-channel-antitop","tW-ch-antitop"),
 
-#	("WW-signal","WW-aTGC"),
-#	("WZ-signal","WZ-aTGC"),
+	("WW-signal_MWW-600To800","WW-aTGC_MWW-600To800"),
+	("WW-signal_MWW-800ToInf","WW-aTGC_MWW-800ToInf"),
+	("WZ-signal_MWZ-600To800","WZ-aTGC_MWZ-600To800"),
+	("WZ-signal_MWZ-800ToInf","WZ-aTGC_MWZ-800ToInf"),
 
 	("data-RunB_ver2","data-RunB_ver2"),
 	("data-RunC","data-RunC"),
