@@ -14,7 +14,7 @@ struct range
 // https://hypernews.cern.ch/HyperNews/CMS/get/generators/3001/1/1/1.html
 
 extern const std::map<int, range> PDFVariationMap = {
-	{292200, range(2001,2100)},
+	{292200, range(1011,1110)},
 	{263000, range(11,110)},
 	{-1, range(2001,2100)},
 	{292000, range(2001,2100)},
