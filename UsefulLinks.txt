@@ -34,6 +34,9 @@ https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC#Jet_Energy_Corrections_in_Run2
 
+# HEEP Electron Identification
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/HEEPElectronIdentificationRun2
+
 # Combined Limit Tool
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit
 
