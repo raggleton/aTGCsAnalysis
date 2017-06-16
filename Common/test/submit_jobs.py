@@ -136,10 +136,10 @@ parser.add_option('-p', '--Feature', dest="Feature", default='my_feature')
 
 
 def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDictionaryElectronChannel, DataDictionaryMuonChannel, JSONFile, YourRunRange,wantToSubmit=False):
-	for key in MCBackgroundsSampleDictionary:
-		ConfigFileName = createConfigFile(key, "mu", True, False)
-		print key, " ", ConfigFileName
-		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
+#	for key in MCBackgroundsSampleDictionary:
+#		ConfigFileName = createConfigFile(key, "mu", True, False)
+#		print key, " ", ConfigFileName
+#		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 #		ConfigFileName = createConfigFile(key, "ele", True, False)
 #		createFileForJob(key, "ele", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 	for key in SignalMCSampleDictionary:
@@ -150,9 +150,9 @@ def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDict
 #	for key in DataDictionaryElectronChannel:
 #		ConfigFileName = createConfigFile(key, "ele", False, False)
 #		createFileForJob(key, "ele", DataDictionaryElectronChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
-	for key in DataDictionaryMuonChannel:
-		ConfigFileName = createConfigFile(key, "mu", False, False)
-		createFileForJob(key, "mu", DataDictionaryMuonChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
+#	for key in DataDictionaryMuonChannel:
+#		ConfigFileName = createConfigFile(key, "mu", False, False)
+#		createFileForJob(key, "mu", DataDictionaryMuonChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
 
 MCBackgroundsSampleDictionaryUnordered =[
 	('ttbar-powheg','/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM'),

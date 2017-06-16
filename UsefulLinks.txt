@@ -37,6 +37,9 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC#Jet_Energy_Corrections_in
 # HEEP Electron Identification
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/HEEPElectronIdentificationRun2
 
+# JER
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#JER_Scaling_factors_and_Uncertai
+
 # Combined Limit Tool
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit
 

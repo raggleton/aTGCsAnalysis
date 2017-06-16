@@ -751,7 +751,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if( LHEevtProductExternal->weights().size() ) {
       for ( unsigned int iwgt = 0; iwgt < LHEevtProductExternal->weights().size(); ++iwgt ) {
         const LHEEventProduct::WGT& wgt = LHEevtProductExternal->weights().at(iwgt);
-        if( boost::algorithm::contains(wgt.id, "mg_reweight_" + std::to_string(weightNumber))){
+        if( boost::algorithm::contains(wgt.id, "rwgt_" + std::to_string(weightNumber))){
          aTGCWeights.push_back(wgt.wgt);
          weightNumber ++;
        }
@@ -1423,14 +1423,17 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //	std::cout<<topSF<<" "<<antitopSF<<" "<<topPtSF<<std::endl;
   }
 
+  int signGenWeight=1;
+  if(isMC && !isSignal) signGenWeight=genWeight/(std::abs(genWeight));
+
   if (isMC) {
-    totWeight = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF*btagWeight*VTagSF*topPtSF;
-    totWeight_BTagUp = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF*btagWeight_BTagUp*VTagSF*topPtSF;
-    totWeight_BTagDown = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF*btagWeight_BTagDown*VTagSF*topPtSF;
-    totWeight_MistagUp = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF*btagWeight_MistagUp*VTagSF*topPtSF;
-    totWeight_MistagDown = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF*btagWeight_MistagDown*VTagSF*topPtSF;
-    totWeight_LeptonIDUp = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF_Up*btagWeight*VTagSF*topPtSF;
-    totWeight_LeptonIDDown = PUweight*(genWeight/(std::abs(genWeight)))*LeptonSF_Down*btagWeight*VTagSF*topPtSF;
+    totWeight = PUweight*signGenWeight*LeptonSF*btagWeight*VTagSF*topPtSF;
+    totWeight_BTagUp = PUweight*signGenWeight*LeptonSF*btagWeight_BTagUp*VTagSF*topPtSF;
+    totWeight_BTagDown = PUweight*signGenWeight*LeptonSF*btagWeight_BTagDown*VTagSF*topPtSF;
+    totWeight_MistagUp = PUweight*signGenWeight*LeptonSF*btagWeight_MistagUp*VTagSF*topPtSF;
+    totWeight_MistagDown = PUweight*signGenWeight*LeptonSF*btagWeight_MistagDown*VTagSF*topPtSF;
+    totWeight_LeptonIDUp = PUweight*signGenWeight*LeptonSF_Up*btagWeight*VTagSF*topPtSF;
+    totWeight_LeptonIDDown = PUweight*signGenWeight*LeptonSF_Down*btagWeight*VTagSF*topPtSF;
   }
   //probably would leave it like that if we keep reweighting to data trigger efficiency in electron channel. In this case lepton ID & trigger scale factors are set to unity in the electron channel.
   /*if (isMC&&channel=="el"){
