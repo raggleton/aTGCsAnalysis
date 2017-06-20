@@ -185,6 +185,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	p.varToWrite = "MWW";
 	p.SetVar(variables);
 	p.SetNbins(30);
+	p.setLumi(35922., 1.);
 
 	
 	// string defaulCuts = "(jet_pt > 200. && jet_tau2tau1 < 0.6  && Mjpruned < 150. && Mjpruned > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900.";

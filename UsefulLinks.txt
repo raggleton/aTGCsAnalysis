@@ -12,6 +12,12 @@ https://gridka-ca.kit.edu/
 
 # NAF Servers
 http://it.desy.de/services/computing_infrastructure/national_analysis_facility___naf/index_eng.html
+# Login to NAF
+maiqbal@nafhh-cms01.desy.de
+# Path to Storage Space
+/pnfs/desy.de/cms/tier2/store/user/maiqbal
+# Delete files here from lxplus
+for i in `gfal-ls srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/maiqbal/` ; do gfal-rm -r "srm://dcache-se-cms.desy.de:8443/srm/managerv2?SFN=/pnfs/desy.de/cms/tier2/store/user/maiqbal/$i" ; done
 
 # MiniAOD2016 Analysis Documentation
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2016

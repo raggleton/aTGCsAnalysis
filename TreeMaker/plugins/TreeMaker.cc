@@ -705,6 +705,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<LHEEventProduct> LHEevtProductExternal;
    iEvent.getByToken(LHEEventProductTokenExternal, LHEevtProductExternal);
    range PDFRange = PDFVariationMap.at(NominalPDF);
+   if(isSignal) PDFRange = PDFVariationMap.at(NominalPDF/100);
    
    //define number of PDF variations 
    unsigned int NPDFs = PDFRange.high - PDFRange.low + 1;

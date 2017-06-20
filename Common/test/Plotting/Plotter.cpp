@@ -18,6 +18,12 @@ void Plotter::SetNbins(int Nbins_)
 	Nbins = Nbins_;
 }
 
+void Plotter::setLumi(double lumi_, double lumiNormFactor_)
+{
+	lumi=lumi_;
+	lumiNormFactor=lumiNormFactor_;
+}
+
 void Plotter::SetSamples(vector <Sample> samples_)
 {
 	samples = samples_;
@@ -354,73 +360,73 @@ void Plotter::Plotting(std::string OutPrefix_)
       for(auto var = variables.begin(); var != variables.end() ; var++)
       {
 	       std::string vname = var->VarName;
-	       if(signalSelection -> EvalInstance()) signalHist[vname]->Fill(var->value(),SignalSample.weight*totWeight*(aTGCWeights->at(6))*2300./20.);//check if the event passeds the selection, and if true fill the histogram
+	       if(signalSelection -> EvalInstance()) signalHist[vname]->Fill(var->value(),SignalSample.weight*totWeight*(aTGCWeights->at(123))*lumi/lumiNormFactor);//check if the event passeds the selection, and if true fill the histogram
       }
       //start filling up hists for different aTGC points
       for (uint iPar =0; iPar < SignalParameters.size()  ; iPar ++)
       {
         if (SignalParameters.at(iPar) == "cwww"){
-            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(0))*2300./20. );
-            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(1))*2300./20. );
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(0))*2300./20. , (aTGCWeights->at(0))*2300./20.);
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(1))*2300./20. , (aTGCWeights->at(1))*2300./20.);
+            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(11))*lumi/lumiNormFactor );
+            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(111))*lumi/lumiNormFactor );
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(11))*lumi/lumiNormFactor , (aTGCWeights->at(11))*lumi/lumiNormFactor);
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(111))*lumi/lumiNormFactor , (aTGCWeights->at(111))*lumi/lumiNormFactor);
             for (uint iPDF = 1; iPDF < PDFWeights -> size() && signalSelection -> EvalInstance(); iPDF++)
             {
-              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(0))*2300./20. );
-              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(1))*2300./20. );
+              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(11))*lumi/lumiNormFactor );
+              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(111))*lumi/lumiNormFactor );
             }
             for (uint iScale = 1; iScale < ScaleWeights -> size() && signalSelection -> EvalInstance(); iScale++)
             {
-              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(0))*2300./20. );
-              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(1))*2300./20. );
+              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(11))*lumi/lumiNormFactor );
+              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(111))*lumi/lumiNormFactor );
             }
            }
         else if (SignalParameters.at(iPar) == "ccw"){
-            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(2))*2300./20. );
-            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(3))*2300./20. );
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(2))*2300./20. , (aTGCWeights->at(2))*2300./20. );
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(3))*2300./20. , (aTGCWeights->at(3))*2300./20. );
+            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(51))*lumi/lumiNormFactor );
+            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(71))*lumi/lumiNormFactor );
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(51))*lumi/lumiNormFactor , (aTGCWeights->at(51))*lumi/lumiNormFactor );
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(71))*lumi/lumiNormFactor , (aTGCWeights->at(71))*lumi/lumiNormFactor );
             for (uint iPDF = 1; iPDF < PDFWeights -> size() && signalSelection -> EvalInstance() ; iPDF++)
             {
-              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(2))*2300./20. );
-              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(3))*2300./20. );
+              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(51))*lumi/lumiNormFactor );
+              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(71))*lumi/lumiNormFactor );
             }
             for (uint iScale = 1; iScale < ScaleWeights -> size() && signalSelection -> EvalInstance(); iScale++)
             {
-              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(2))*2300./20. );
-              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(3))*2300./20. );
+              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(51))*lumi/lumiNormFactor );
+              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(71))*lumi/lumiNormFactor );
             }
            }
         else if (SignalParameters.at(iPar) == "cb"){
-            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(4))*2300./20. );
-            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(5))*2300./20. );
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(4))*2300./20. , (aTGCWeights->at(4))*2300./20.);
-            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(5))*2300./20. , (aTGCWeights->at(5))*2300./20.);
+            if(signalSelection -> EvalInstance()) signalHistPerParPositive[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(59))*lumi/lumiNormFactor );
+            if(signalSelection -> EvalInstance()) signalHistPerParNegative[SignalParameters.at(iPar)]->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(63))*lumi/lumiNormFactor );
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParPositive_SystUp[SignalParameters.at(iPar)], signalHistPerParPositive_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(59))*lumi/lumiNormFactor , (aTGCWeights->at(59))*lumi/lumiNormFactor);
+            systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, signalHistPerParNegative_SystUp[SignalParameters.at(iPar)], signalHistPerParNegative_SystDown[SignalParameters.at(iPar)], totWeight*(aTGCWeights->at(63))*lumi/lumiNormFactor , (aTGCWeights->at(63))*lumi/lumiNormFactor);
             for (uint iPDF = 1; iPDF < PDFWeights -> size() && signalSelection -> EvalInstance() ; iPDF++)
             {
-              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(4))*2300./20. );
-              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(5))*2300./20. );
+              histsPDFSignalPerFilePositive[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(59))*lumi/lumiNormFactor );
+              histsPDFSignalPerFileNegative[SignalParameters.at(iPar)].at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(63))*lumi/lumiNormFactor );
             }
             for (uint iScale = 1; iScale < ScaleWeights -> size() && signalSelection -> EvalInstance(); iScale++)
             {
-              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(4))*2300./20. );
-              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(5))*2300./20. );
+              histsScaleSignalPerFilePositive[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(59))*lumi/lumiNormFactor );
+              histsScaleSignalPerFileNegative[SignalParameters.at(iPar)].at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(63))*lumi/lumiNormFactor );
             }
            }
           else  throw std::runtime_error("parameter is not supported, something is confused");
 
       }//end of filling different aTGC points 
 
-      if (signalSelection -> EvalInstance()) SMhist->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(7))*2300./20. );
-      systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, SMhist_SystUp, SMhist_SystDown, totWeight*(aTGCWeights->at(7))*2300./20. , (aTGCWeights->at(7))*2300./20. );
+      if (signalSelection -> EvalInstance()) SMhist->Fill(varToWriteObj->value(),totWeight*(aTGCWeights->at(61))*lumi/lumiNormFactor );
+      systematics.fillHist(varToWriteObj, SystematicsVarMapUp, SystematicsVarMapDown, SMhist_SystUp, SMhist_SystDown, totWeight*(aTGCWeights->at(61))*lumi/lumiNormFactor , (aTGCWeights->at(61))*lumi/lumiNormFactor );
       for (uint iPDF = 1; iPDF < PDFWeights -> size() && signalSelection -> EvalInstance(); iPDF++)
       {
-         SMhistsPDF.at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(7))*2300./20. );
+         SMhistsPDF.at(iPDF-1) -> Fill(varToWriteObj->value(),totWeight*PDFWeights->at(iPDF)*(aTGCWeights->at(61))*lumi/lumiNormFactor );
       }
 
       for (uint iScale = 1; iScale < ScaleWeights -> size() && signalSelection -> EvalInstance(); iScale++)
       {
-        SMhistsScale.at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(7))*2300./20. );
+        SMhistsScale.at(iScale-1) -> Fill(varToWriteObj->value(),totWeight*ScaleWeights->at(iScale)*(aTGCWeights->at(61))*lumi/lumiNormFactor );
       }
 
       PDFWeights -> clear();

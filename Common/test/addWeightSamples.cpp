@@ -100,7 +100,7 @@ void addWeightSamples()
   std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/";
 
   //electron channel
-  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
+  /*addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
   addWeight(prefix + "t-ch_ele.root", 216.99*0.33, lumi, "ele");
@@ -113,7 +113,7 @@ void addWeightSamples()
   addWeight(prefix + "WJets_Ht800To1200_ele.root", 5.501*1.21, lumi, "ele");
   addWeight(prefix + "WJets_Ht1200To2500_ele.root", 1.329*1.21, lumi, "ele"); 
   addWeight(prefix + "WJets_Ht2500ToInf_ele.root", 0.03216*1.21, lumi, "ele"); 
-  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");
+  addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");*/
   
   //muon channel
   addWeight(prefix + "WW_mu.root", 49.997, lumi, "");

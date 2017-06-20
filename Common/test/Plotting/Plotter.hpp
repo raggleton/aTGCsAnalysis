@@ -44,7 +44,8 @@ enum CHANNEL {
 
 class Plotter
 {
-    int Nbins;
+   	int Nbins;
+	double lumi, lumiNormFactor;
 	vector <Sample> samples;
 	CHANNEL channel;
 	vector <Var> variables;
@@ -55,8 +56,6 @@ class Plotter
 	TFile *fileToWriteHistsSignal;
 	std::string varToWrite;
 	Var *varToWriteObj;
-	Plotter();	
-	Plotter(CHANNEL channel_);
 	Sample DataSample;
 	Sample SignalSample;
 	bool withData = true;
@@ -64,7 +63,11 @@ class Plotter
 	bool withSignal = true;
 	bool withMC = true;
 	bool wantToWriteHists = false;
+	
+	Plotter();
+	Plotter(CHANNEL channel_);
 	void SetNbins(int Nbins_);
+	void setLumi(double, double);
 	void SetVar(vector <Var> variables_);
 	void SetSamples(vector <Sample> samples_);	
 	void SetDataSample(Sample sample_);
