@@ -232,4 +232,6 @@ SignalMCSampleDictionary=collections.OrderedDict(SignalMCSampleDictionaryUnorder
 DataDictionaryMuonChannel=collections.OrderedDict(DataDictionaryMuonChannelUnordered)
 DataDictionaryElectronChannel=collections.OrderedDict(DataDictionaryElectronChannelUnordered)
 
-submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDictionaryElectronChannel, DataDictionaryMuonChannel, MyJSON,"271036-284044", True)
+
+if __name__ == "__main__":
+	submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDictionaryElectronChannel, DataDictionaryMuonChannel, MyJSON,"271036-284044", True)
