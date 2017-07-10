@@ -46,6 +46,9 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/HEEPElectronIdentificationRun2
 # JER
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#JER_Scaling_factors_and_Uncertai
 
+# GenXSecAnalyzer Tool (for computing cross sections for signal samples)
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/HowToGenXSecAnalyzer
+
 # Combined Limit Tool
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit
 
