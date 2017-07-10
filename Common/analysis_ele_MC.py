@@ -86,6 +86,9 @@ process.jetSequence = cms.Sequence(process.fatJetsSequence +
 				                            process.jetFilter+
                           				   process.AK4JetsSequence)
 
+# Update the MET for latest JEC etc
+from aTGCsAnalysis.Common.MET_cff import doMetCorrections
+doMetCorrections(process, isData=False, runBtoF=False)
 
 process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     PUInfo = cms.InputTag("slimmedAddPileupInfo"),
@@ -116,14 +119,13 @@ process.DecayChannel = cms.EDAnalyzer("DecayChannelAnalyzer")
 process.metSequenceSystematics = CreateWLepWithSystematicsSequence(process, "el")
 
 # PATH
-process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence  + process.metSequenceSystematics  + process.treeDumper)
+process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.fullPatMetSequence + process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence  + process.metSequenceSystematics  + process.treeDumper)
 
 
-#process.maxEvents.input = 1000
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring('file:///afs/cern.ch/user/i/ishvetso/eos/cms/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/002825F6-8D1E-E611-8276-002481E94B26.root'),
-    
+
 )
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")

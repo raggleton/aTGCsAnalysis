@@ -89,6 +89,10 @@ process.jetSequence = cms.Sequence(process.fatJetsSequence +
                                     process.jetFilter+
                                      process.AK4JetsSequence )
 
+# Update the MET for latest JEC etc
+from aTGCsAnalysis.Common.MET_cff import doMetCorrections
+doMetCorrections(process, isData=False, runBtoF=False)
+
 process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     PUInfo = cms.InputTag("slimmedAddPileupInfo"),
                                     genInfo = cms.InputTag("generator"),
@@ -117,7 +121,7 @@ process.DecayChannel = cms.EDAnalyzer("DecayChannelAnalyzer")
 process.metSequenceSystematics = CreateWLepWithSystematicsSequence(process, "mu")
 
 # PATH
-process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.METmu +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence + process.metSequenceSystematics +  process.treeDumper)
+process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.fullPatMetSequence + process.METmu +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence + process.metSequenceSystematics +  process.treeDumper)
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),

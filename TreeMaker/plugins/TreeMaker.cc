@@ -247,6 +247,10 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
 {
 
+  if ((channel != "mu") && (channel != "el")) {
+    throw cms::Exception("InvalidValue") << "Invalid value for channel parameter, should be mu or el." << std::endl;
+  }
+
   // For PUPPI Correction
   edm::FileInPath puppiCorr("aTGCsAnalysis/TreeMaker/data/puppiCorrSummer16.root");
   TFile* file = TFile::Open( puppiCorr.fullPath().c_str(),"READ");
@@ -658,9 +662,11 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    std::map<std::string, math::XYZTLorentzVector>  SystMap; 
    std::map<std::string, math::XYZTLorentzVector>  LeptonSystMap;
+   std::map<std::string, math::XYZTLorentzVector>  MetSystMap;
    if (isMC) {
       SystMap = SystematicsHelper_.getWLepSystematicsLoretzVectors(iEvent);
       LeptonSystMap = SystematicsHelper_.getLeptonSystematicsLoretzVectors(iEvent);
+      MetSystMap = SystematicsHelper_.getMetSystematicsLoretzVectors(iEvent);
    }
 
    nPV = vertices->size();
@@ -825,11 +831,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       triggerWeightHLTEle27NoER  =  trigEle27NoER::turnOn(sc_et, sc_eta);
 
     }
-    else {
-      std::cerr << "Invalid channel used, use el or mu." << std::endl;
-      exit(0);
-    }
-     if (isMC){
+    if (isMC){
        Lepton.pt_LeptonEnUp = LeptonSystMap.at("LeptonEnUp").Pt();
        Lepton.pt_LeptonEnDown = LeptonSystMap.at("LeptonEnDown").Pt();
        Lepton.pt_LeptonResUp = LeptonSystMap.at("LeptonResUp").Pt();
@@ -857,7 +859,6 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       LeptonSF_Up =  LeptonSF;
       LeptonSF_Down =  LeptonSF;
     }
-   else  throw cms::Exception("InvalidValue") << "Invalid channel, should be mu or el." << std::endl; 
    //leptonically decaying W
    if (leptonicVs -> size() > 0)
    {
@@ -947,66 +948,38 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
   }
   
-    //MET quantities   
+    //MET quantities
    if (metHandle->size() > 0)
    {
       const pat::MET& metCand = metHandle->at(0);
-      
+
       METCand.pt = metCand.pt();
       METCand.phi = metCand.phi();
+
       //MET uncertainties
-      //METUncl
       if (isMC){
-          MET_UnclEnUp = metCand.shiftedPt( pat::MET::UnclusteredEnUp, pat::MET::Type1) ;
-          MET_UnclEnDown = metCand.shiftedPt( pat::MET::UnclusteredEnDown, pat::MET::Type1) ;
-          //JER
-          MET_JERUp = metCand.shiftedPt( pat::MET::JetResUp, pat::MET::Type1) ;
-          MET_JERDown = metCand.shiftedPt( pat::MET::JetResDown, pat::MET::Type1) ;
-          //JEC
-          MET_JECUp = metCand.shiftedPt( pat::MET::JetEnUp, pat::MET::Type1) ;
-          MET_JECDown = metCand.shiftedPt( pat::MET::JetEnDown, pat::MET::Type1) ;
-          //Electron energy 
-          if( channel == "el") {
-            MET_LeptonEnUp = metCand.shiftedPt( pat::MET::ElectronEnUp, pat::MET::Type1) ;
-            MET_LeptonEnDown = metCand.shiftedPt( pat::MET::ElectronEnDown, pat::MET::Type1) ;
-          }
-          //Muon energy 
-          else if (channel == "mu"){
-            MET_LeptonEnUp = metCand.shiftedPt( pat::MET::MuonEnUp, pat::MET::Type1) ;
-            MET_LeptonEnDown = metCand.shiftedPt( pat::MET::MuonEnDown, pat::MET::Type1) ;
-          }
-          
-          else {
-            std::cerr << "Invalid channel used, please use mu or el." << std::endl;
-            exit(0);
-          }  
-          //MET phi uncertainties
-          //METUncl
-          MET_Phi_UnclEnUp = metCand.shiftedPhi( pat::MET::UnclusteredEnUp, pat::MET::Type1) ;
-          MET_Phi_UnclEnDown = metCand.shiftedPhi( pat::MET::UnclusteredEnDown, pat::MET::Type1) ;
-          //JER
-          MET_Phi_JERUp = metCand.shiftedPhi( pat::MET::JetResUp, pat::MET::Type1) ;
-          MET_Phi_JERDown = metCand.shiftedPhi( pat::MET::JetResDown, pat::MET::Type1) ;
-          //JEC
-          MET_Phi_JECUp = metCand.shiftedPhi( pat::MET::JetEnUp, pat::MET::Type1) ;
-          MET_Phi_JECDown = metCand.shiftedPhi( pat::MET::JetEnDown, pat::MET::Type1) ;
-          //Lepton energy 
-          if (channel == "el"){
-            MET_Phi_LeptonEnUp = metCand.shiftedPhi( pat::MET::ElectronEnUp, pat::MET::Type1) ;
-            MET_Phi_LeptonEnDown = metCand.shiftedPhi( pat::MET::ElectronEnDown, pat::MET::Type1) ;
-          }
-          else if (channel == "mu"){
-            MET_Phi_LeptonEnUp = metCand.shiftedPhi( pat::MET::MuonEnUp, pat::MET::Type1) ;
-            MET_Phi_LeptonEnDown = metCand.shiftedPhi( pat::MET::MuonEnDown, pat::MET::Type1) ;
-        }
-         else {
-            std::cerr << "Invalid channel used, please use mu or el." << std::endl;
-           exit(0);
-          }  
-      } 
+        // MET uncertainties
+        MET_LeptonEnUp = MetSystMap.at("LeptonEnUp").Pt();
+        MET_LeptonEnDown = MetSystMap.at("LeptonEnDown").Pt();
+        MET_JECUp = MetSystMap.at("JetEnUp").Pt();
+        MET_JECDown = MetSystMap.at("JetEnDown").Pt();
+        MET_JERUp = MetSystMap.at("JetResUp").Pt();
+        MET_JERDown = MetSystMap.at("JetResDown").Pt();
+        MET_UnclEnUp = MetSystMap.at("UnclusteredEnUp").Pt();
+        MET_UnclEnDown = MetSystMap.at("UnclusteredEnDown").Pt();
+
+        //MET phi uncertainties
+        MET_Phi_LeptonEnUp = MetSystMap.at("LeptonEnUp").Phi();
+        MET_Phi_LeptonEnDown = MetSystMap.at("LeptonEnDown").Phi();
+        MET_Phi_JECUp = MetSystMap.at("JetEnUp").Phi();
+        MET_Phi_JECDown = MetSystMap.at("JetEnDown").Phi();
+        MET_Phi_JERUp = MetSystMap.at("JetResUp").Phi();
+        MET_Phi_JERDown = MetSystMap.at("JetResDown").Phi();
+        MET_Phi_UnclEnUp = MetSystMap.at("UnclusteredEnUp").Phi();
+        MET_Phi_UnclEnDown = MetSystMap.at("UnclusteredEnDown").Phi();
+      }
    }
-   
-    else
+   else
    {
       METCand.pt = -99.;
       METCand.phi = -99.;

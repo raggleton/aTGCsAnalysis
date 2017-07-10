@@ -6,7 +6,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
-process.options.allowUnscheduled = cms.untracked.bool(False) 
+process.options.allowUnscheduled = cms.untracked.bool(False)
 
 process.load("aTGCsAnalysis.Common.goodMuons_cff")
 process.load("aTGCsAnalysis.Common.goodElectrons_cff")
@@ -84,6 +84,9 @@ process.jetSequence = cms.Sequence(process.fatJetsSequence +
                                             process.jetFilter+
                                            process.AK4JetsSequence )
 
+# Update the MET for latest JEC etc
+from aTGCsAnalysis.Common.MET_cff import doMetCorrections
+doMetCorrections(process, isData=True, runBtoF=True)
 
 process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     rho = cms.InputTag("fixedGridRhoFastjetAll"),
@@ -108,7 +111,7 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
 process.DecayChannel = cms.EDAnalyzer("DecayChannelAnalyzer")
 
 # PATH
-process.analysis = cms.Path(process.NoiseFilters + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.TriggerElectron +  process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence  + process.treeDumper)
+process.analysis = cms.Path(process.NoiseFilters + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.TriggerElectron + process.fullPatMetSequence + process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence  + process.treeDumper)
 
 
 
