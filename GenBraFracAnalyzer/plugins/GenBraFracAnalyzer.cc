@@ -23,15 +23,20 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
+#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
+#include "TLorentzVector.h"
+
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "TTree.h"
+#include "TFile.h"
 
 using namespace edm;
 using namespace std;
@@ -61,8 +66,11 @@ class GenBraFracAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources
       virtual void endJob() override;
       virtual bool decaysHadronic(const GenParticle*);
 
+      TTree* tree;
+      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> hadronicVp4, leptonicVp4, dibosonp4;
       double ptV, mWV;
-      int totalEvents, selectedEvents;
+      bool inSelRegA, inSelRegB;
+      int totalEvents, selectedEventsRegA, selectedEventsRegB;
       EDGetTokenT<View<GenParticle>> src;
 
       // ----------member data ---------------------------
@@ -84,10 +92,20 @@ GenBraFracAnalyzer::GenBraFracAnalyzer(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
    usesResource("TFileService");
+   Service<TFileService> fs;
+   tree=fs->make<TTree>("EventInfo","EventInfo");
+   tree->Branch("ptV", &ptV, "ptV/D");
+   tree->Branch("mWV", &mWV, "mWV/D");
+   tree->Branch("inSelRegA", &inSelRegA, "inSelRegA/B");
+   tree->Branch("inSelRegB", &inSelRegB, "inSelRegB/B");
+
    ptV=0;
    mWV=0;
+   inSelRegA=false;
+   inSelRegB=false;
    totalEvents=0;
-   selectedEvents=0;
+   selectedEventsRegA=0;
+   selectedEventsRegB=0;
    src = consumes<View<GenParticle>>(iConfig.getParameter<InputTag>("src"));
 }
 
@@ -111,6 +129,8 @@ GenBraFracAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 {
    ptV=0;
    mWV=0;
+   inSelRegA=false;
+   inSelRegB=false;
  
    Handle<View<GenParticle>> genParticles;
    iEvent.getByToken(src, genParticles);
@@ -122,17 +142,43 @@ GenBraFracAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	if((fabs(p.pdgId())==23 || fabs(p.pdgId())==24) && p.status()==22)
 	{
 		if(decaysHadronic(&p))
+		{
 			ptV=p.pt();
-		//if(decaysHadronic(&p))cout<<"*Hadronically decaying W*"<<endl;
-		//else cout<<"*Leptonically decaying W*"<<endl;
+			
+			hadronicVp4.SetPt(p.pt());
+			hadronicVp4.SetEta(p.eta());
+			hadronicVp4.SetPhi(p.phi());
+			hadronicVp4.SetM(p.mass());
+			//cout<<"*Hadronically decaying W* "<<hadronicVp4.px()<<" "<<hadronicVp4.py()<<" "<<hadronicVp4.pz()<<" "<<hadronicVp4.e()<<" "<<hadronicVp4.M()<<endl;
+		}
+		else
+		{
+			leptonicVp4.SetPt(p.pt());
+			leptonicVp4.SetEta(p.eta());
+			leptonicVp4.SetPhi(p.phi());
+			leptonicVp4.SetM(p.mass());
+			//cout<<"*Leptonically decaying W* "<<leptonicVp4.px()<<" "<<leptonicVp4.py()<<" "<<leptonicVp4.pz()<<" "<<leptonicVp4.e()<<" "<<leptonicVp4.M()<<endl;
+		}
 	}
    }
-   //cout<<endl;
+
+   dibosonp4=hadronicVp4+leptonicVp4;
+   mWV=dibosonp4.M();
+   //cout<<"Diboson mass: "<<mWV<<endl<<endl;
 
    totalEvents++;
-   if(ptV>180)
-	selectedEvents++;
+   if(ptV>180 && mWV>600 && mWV<800)
+   {
+	selectedEventsRegA++;
+	inSelRegA=true;
+   }
+   else if(ptV>180 && mWV>800)
+   {
+        selectedEventsRegB++;
+        inSelRegB=true;
+   }
 
+   tree->Fill();
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
@@ -174,8 +220,10 @@ void
 GenBraFracAnalyzer::endJob() 
 {
    cout<<endl<<"Total events in the file: "<<totalEvents<<endl;
-   cout<<"Events in our selection range: "<<selectedEvents<<endl;
-   cout<<"Required branching fraction: "<<(float)selectedEvents/(float)totalEvents<<endl;
+   cout<<"Events with diboson mass in [600, 800] GeV: "<<selectedEventsRegA<<endl;
+   cout<<"Required branching fraction for diboson mass in [600, 800]: "<<(float)selectedEventsRegA/(float)totalEvents<<endl;
+   cout<<"Events with diboson mass > 800 GeV: "<<selectedEventsRegB<<endl;
+   cout<<"Required branching fraction for diboson mass > 800 GeV: "<<(float)selectedEventsRegB/(float)totalEvents<<endl;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
