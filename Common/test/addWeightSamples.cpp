@@ -115,8 +115,10 @@ void addWeightSamples()
   addWeight(prefix + "WJets_Ht2500ToInf_ele.root", 0.03216*1.21, lumi, "ele"); 
   addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");
 
-  addWeight(prefix + "WW-aTGC_ele.root", insertXSec, lumi, "ele");
-  addWeight(prefix + "WZ-aTGC_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", insertXSec, lumi, "ele");
 */
   
   //muon channel
@@ -135,7 +137,9 @@ void addWeightSamples()
   addWeight(prefix + "WJets_Ht2500ToInf_mu.root", 0.03216*1.21, lumi,"");
   addWeight(prefix + "ttbar_mu.root", 831.76, lumi,"");
 
-  addWeight(prefix + "WW-aTGC_mu.root", 0.1872, lumi, "");
-  addWeight(prefix + "WZ-aTGC_mu.root", 0.06309, lumi, "");  
- 
+  addWeight(prefix + "WW-aTGC_MWW-600To800_mu.root", 0.1833, lumi, "");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_mu.root", 0.2366, lumi, "");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_mu.root", 0.06493, lumi, "");  
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root", 0.1012, lumi, "");
+
 }
