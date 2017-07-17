@@ -28,7 +28,7 @@ def createConfigFile(processName, channel, isMC, isSignal, runBtoF=True):
 	if not os.path.exists("analysisConfigs"):
 		os.makedirs("analysisConfigs")
 	BTagEfficiencyPattern = "BtagEffFile = cms.string(\"\"),\n"
-	VTagSFPattern = "VTagSF = cms.double(0.915)"
+	VTagSFPattern = "VTagSF = cms.double(1.03)"
 	ConfigFileName = ""
    	if isSignal and isMC :
    		shutil.copy("../analysis_" + channel + "_signal.py", "analysisConfigs")
