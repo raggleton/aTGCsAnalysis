@@ -47,7 +47,10 @@ void dumpPlotCategory(std::string filename, std::string ProcessName, std::string
 	gStyle->SetOptStat(0);
 	//gStyle->SetOptTitle(0);
 	TFile eff_file(filename.c_str());
-	TEfficiency *eff = (TEfficiency*)eff_file.Get(("BtagAnalyzer/h2_BTaggingEff_" + category ).c_str());
+	TEfficiency *eff = (TEfficiency*)eff_file.Get(("BtagAnalyzer/BTaggingEff_" + category ).c_str());
+	if (eff == nullptr) {
+		throw runtime_error("Cannot get TEfficiency object");
+	}
 	setTDRStyle();
 	gStyle->SetPalette(55);
 	gStyle->SetNumberContours(255);

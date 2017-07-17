@@ -57,9 +57,9 @@ public:
 			MaxBJetPt = 669.9;
 			//get measured efficiencies
 			TFile effFile(EfficiencyFile.fullPath().c_str());
-			eff_b = (TEfficiency*)effFile.Get("BtagAnalyzer/h2_BTaggingEff_b");
-			eff_c = (TEfficiency*)effFile.Get("BtagAnalyzer/h2_BTaggingEff_c");
-			eff_udsg = (TEfficiency*)effFile.Get("BtagAnalyzer/h2_BTaggingEff_udsg");
+			eff_b = (TEfficiency*)effFile.Get("BtagAnalyzer/BTaggingEff_b");
+			eff_c = (TEfficiency*)effFile.Get("BtagAnalyzer/BTaggingEff_c");
+			eff_udsg = (TEfficiency*)effFile.Get("BtagAnalyzer/BTaggingEff_udsg");
 			hist_eff = (TH2D*) eff_b->GetPassedHistogram();//get histogram to get binning info
 			DiscrName = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
 		}
