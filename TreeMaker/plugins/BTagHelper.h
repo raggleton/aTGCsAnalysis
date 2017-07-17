@@ -29,8 +29,9 @@ enum BTagUncertaintyType{
 	bool DONOTHING;
 public:
 	std::auto_ptr<BTagCalibrationReader>  reader, reader_up, reader_down;
-	BTagHelper(std::string BtagEffFileName_)
-	{	
+	BTagHelper(std::string BtagEffFileName_, double BtagDiscrCut):
+		DiscrCut(BtagDiscrCut)
+	{
 		if (BtagEffFileName_.empty()) DONOTHING = true;
 		else DONOTHING = false;
 		if (!DONOTHING){
@@ -60,7 +61,6 @@ public:
 			eff_c = (TEfficiency*)effFile.Get("BtagAnalyzer/h2_BTaggingEff_c");
 			eff_udsg = (TEfficiency*)effFile.Get("BtagAnalyzer/h2_BTaggingEff_udsg");
 			hist_eff = (TH2D*) eff_b->GetPassedHistogram();//get histogram to get binning info
-			DiscrCut = 0.935;
 			DiscrName = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
 		}
 	}

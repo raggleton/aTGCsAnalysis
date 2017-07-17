@@ -252,7 +252,7 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     "aTGCsAnalysis/TreeMaker/data/egammaEffi.txt_EGM2D.root"
   ),
   JetResolutionSmearer_(iConfig.getParameter<bool>("isMC")),
-  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
+  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"), iConfig.getParameter<double>("BtagDiscrCut"))
 {
 
   if ((channel != "mu") && (channel != "el")) {
