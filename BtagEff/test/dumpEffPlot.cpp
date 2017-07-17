@@ -1,3 +1,6 @@
+/**
+ * Compile using `make`. Requires you to have compiled in Common/test/Plotting
+ **/
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
@@ -17,14 +20,14 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
-#include <stdio.h>      
-#include <stdlib.h>  
+#include <stdio.h>
+#include <stdlib.h>
 #include <TASImage.h>
-#include </afs/cern.ch/work/i/ishvetso/GitHub/IvanShvetsov/CMS_stylistics/tdrstyle.C>
-#include </afs/cern.ch/work/i/ishvetso/GitHub/IvanShvetsov/CMS_stylistics/CMS_lumi.cpp>
 #include <boost/algorithm/string/replace.hpp>
 #include "boost/algorithm/string.hpp"
-#include "aTGCsAnalysis/Common/test/Plotting/Sample.hpp"
+#include "../../Common/test/Plotting/tdrstyle.hpp"
+#include "../../Common/test/Plotting/CMS_lumi.hpp"
+#include "../../Common/test/Plotting/Sample.hpp"
 
 TH2D * convertEffToTH2F(TEfficiency * eff_){
 	TH2D *hist_eff = (TH2D*) eff_->GetPassedHistogram();
@@ -52,11 +55,11 @@ void dumpPlotCategory(std::string filename, std::string ProcessName, std::string
 		throw runtime_error("Cannot get TEfficiency object");
 	}
 	setTDRStyle();
-	gStyle->SetPalette(55);
+	// gStyle->SetPalette(55);
 	gStyle->SetNumberContours(255);
 	if (category != "udsg")gStyle->SetPaintTextFormat("4.4f");
 	else gStyle->SetPaintTextFormat("4.5f");
-	gStyle->SetPadLeftMargin(0.15);
+	// gStyle->SetPadLeftMargin(0.15);
 	gStyle->SetPadRightMargin(0.15);
 	TCanvas *c1=  new TCanvas("c1","canvas",1200,800);
 	c1 -> SetLogx();
@@ -143,4 +146,9 @@ void dumpEffPlot(){
 
 
 
+}
+
+
+int main() {
+	dumpEffPlot();
 }
