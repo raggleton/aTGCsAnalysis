@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-process = cms.Process( "BtagEff" )
+from aTGCsAnalysis.SystematicsProducers.metSystematics_cff import *
+process = cms.Process( "aTGCanalysis" )
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
 )
@@ -13,14 +14,20 @@ process.load("aTGCsAnalysis.Common.MET_cff")
 process.load("aTGCsAnalysis.Common.goodJets_cff")
 process.load("aTGCsAnalysis.Common.trigger_cff")
 process.load("aTGCsAnalysis.Common.leptonicW_cff")
-
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
-process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_RunIIFall15DR76_v1'
+process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
+process.load('RecoMET.METFilters.BadPFMuonFilter_cfi')
+
+process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
+process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
+process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+process.BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
+process.BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
 process.NoiseFilters = cms.EDFilter("NoiseFilter",
             noiseFilter = cms.InputTag("TriggerResults", "", "PAT"),
-            filterNames = cms.vstring("Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter",  "Flag_CSCTightHaloFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter") 
+            filterNames = cms.vstring("Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter",  "Flag_globalTightHalo2016Filter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter") 
             )
 
 
@@ -47,13 +54,13 @@ for idmod in my_id_modules:
 #
 
 process.ElectronVeto = cms.EDFilter("LeptonVeto",
-				    looseLeptonSrc = cms.InputTag("looseElectrons"),
-				    tightLeptonSrc = cms.InputTag("tightElectrons"),
+            looseLeptonSrc = cms.InputTag("looseElectrons"),
+            tightLeptonSrc = cms.InputTag("tightElectrons"),
                                     minNLoose = cms.int32(1),
                                     maxNLoose = cms.int32(1),
                                     minNTight = cms.int32(1),
                                     maxNTight = cms.int32(1),
-				   )
+           )
 
 process.MuonVeto = cms.EDFilter("LeptonVeto",
             looseLeptonSrc = cms.InputTag("looseMuons"),
@@ -64,7 +71,7 @@ process.MuonVeto = cms.EDFilter("LeptonVeto",
                                     maxNTight = cms.int32(0),
            )
 
-process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto  )
+process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto +  process.leptonicWtoenuSequenceMC )
 
 process.jetFilter = cms.EDFilter("CandViewCountFilter",
                                  src = cms.InputTag("goodJets"),
@@ -72,28 +79,31 @@ process.jetFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 process.jetSequence = cms.Sequence(process.fatJetsSequence +
-				                            process.jetFilter+
-                          				   process.AK4JetsSequence)
+                                    process.jetFilter+
+                                     process.AK4JetsSequence)
+
+# Update the MET for latest JEC etc
+from aTGCsAnalysis.Common.MET_cff import doMetCorrections
+doMetCorrections(process, isData=False, runBtoF=False)
+
 
 process.BtagAnalyzer = cms.EDAnalyzer("BTaggingEffAnalyzer",
-                  									  JetsTag = cms.InputTag("goodAK4Jets"),
-                  									  DiscriminatorTag = cms.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
-                  									  DiscriminatorValue = cms.double(0.935),
-                  									  PtNBins = cms.int32(5),
-                                      ptBinning = cms.vdouble(30.,40., 50.,100., 200.,2000. ),
-                                      EtaNBins = cms.int32(5),
-                                      etaBinning = cms.vdouble(-2.4, -1.5, -0.8, 0.8,1.5, 2.4),
-									                   )
+                                      JetsTag = cms.InputTag("goodAK4Jets"),
+                                      DiscriminatorTag = cms.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
+                                      DiscriminatorValue = cms.double(0.9535),
+                                      ptBinning = cms.vdouble(20., 30., 50., 70., 100., 140., 200., 300., 600., 1000.),
+                                      etaBinning = cms.vdouble(-2.4, 2.4)
+                                    )
 
 # PATH
-process.btagPath = cms.Path(process.NoiseFilters  + process.TriggerElectron + process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence + process.BtagAnalyzer)
+process.analysis = cms.Path(process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.fullPatMetSequence + process.METele +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence + process.BtagAnalyzer)
+
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('/store/mc/RunIIFall15MiniAODv2/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/008262ED-4CB8-E511-BDF3-D067E5F90F2A.root'),
-    
-)
+    fileNames = cms.untracked.vstring('file:///afs/cern.ch/user/i/ishvetso/eos/cms/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/002825F6-8D1E-E611-8276-002481E94B26.root'),
 
+)
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
