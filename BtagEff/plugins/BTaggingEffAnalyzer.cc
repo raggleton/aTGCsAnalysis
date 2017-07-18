@@ -58,10 +58,10 @@ class BTaggingEffAnalyzer : public edm::EDAnalyzer {
       const edm::InputTag jetsTag;
       const std::string   discriminatorTag;
       const double  discriminatorValue;
-      const int     ptNBins;
+
       const std::vector<double>  ptBinning;
-      const int     etaNBins;
       const std::vector<double>  etaBinning;
+
       edm::Service<TFileService>  fs;
       TEfficiency  *BTaggingEff_b;
       TEfficiency  *BTaggingEff_c;
@@ -83,16 +83,13 @@ BTaggingEffAnalyzer::BTaggingEffAnalyzer(const edm::ParameterSet& iConfig) :
   JetsToken(consumes<std::vector<pat::Jet>>(iConfig.getParameter<edm::InputTag>("JetsTag"))),
   discriminatorTag(iConfig.getParameter<std::string>("DiscriminatorTag")),
   discriminatorValue(iConfig.getParameter<double>("DiscriminatorValue")),
-  ptNBins(iConfig.getParameter<int>("PtNBins")),
   ptBinning(iConfig.getParameter<std::vector<double>>("ptBinning")),
-  etaNBins(iConfig.getParameter<int>("EtaNBins")),
   etaBinning(iConfig.getParameter<std::vector<double>>("etaBinning"))
-
 {
    //now do what ever initialization is needed
-   BTaggingEff_b    = fs->make<TEfficiency>("BTaggingEff_b", ";p_{T} (GeV);#eta", ptNBins, &ptBinning[0], etaNBins, &etaBinning[0]);
-   BTaggingEff_c    = fs->make<TEfficiency>("BTaggingEff_c", ";p_{T} (GeV);#eta", ptNBins, &ptBinning[0], etaNBins, &etaBinning[0]);
-   BTaggingEff_udsg = fs->make<TEfficiency>("BTaggingEff_udsg", ";p_{T} (GeV);#eta", ptNBins, &ptBinning[0], etaNBins, &etaBinning[0]);
+   BTaggingEff_b    = fs->make<TEfficiency>("BTaggingEff_b", ";p_{T} (GeV);#eta", ptBinning.size()-1, &ptBinning[0], etaBinning.size()-1, &etaBinning[0]);
+   BTaggingEff_c    = fs->make<TEfficiency>("BTaggingEff_c", ";p_{T} (GeV);#eta", ptBinning.size()-1, &ptBinning[0], etaBinning.size()-1, &etaBinning[0]);
+   BTaggingEff_udsg = fs->make<TEfficiency>("BTaggingEff_udsg", ";p_{T} (GeV);#eta", ptBinning.size()-1, &ptBinning[0], etaBinning.size()-1, &etaBinning[0]);
    BTaggingEff_b    -> SetStatisticOption(TEfficiency::kFCP);
    BTaggingEff_c    -> SetStatisticOption(TEfficiency::kFCP);
    BTaggingEff_udsg -> SetStatisticOption(TEfficiency::kFCP);
