@@ -36,7 +36,7 @@ public:
 		else DONOTHING = false;
 		if (!DONOTHING){
 			//scale factors from CSV file
-			edm::FileInPath CSVFile("aTGCsAnalysis/TreeMaker/data/CSVv2.csv");
+			edm::FileInPath CSVFile("aTGCsAnalysis/TreeMaker/data/CSVv2_Moriond17_B_H.csv");
 			edm::FileInPath EfficiencyFile(BtagEffFileName_);
 			calib = BTagCalibration("CSVv2", CSVFile.fullPath());
 			//nominal
