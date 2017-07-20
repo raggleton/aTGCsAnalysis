@@ -19,7 +19,7 @@ void nEvents(string filename)
 
   double gentWeight;
   int sumSigns=0;
-  int sumGenWeights=0;
+  double sumGenWeights=0;
   TFile file(filename.c_str(), "READ");
   TTree * tree = (TTree*) file.Get("GenWeights/Tree");
   
@@ -84,7 +84,7 @@ void checkSumEvents()
 
   nEvents(prefix + "WW-aTGC_MWW-600To800_mu.root");
   nEvents(prefix + "WW-aTGC_MWW-800ToInf_mu.root");
-  nEvents(prefix + "WZ-aTGC_MWZ-600To800_mu.root");  
+  nEvents(prefix + "WZ-aTGC_MWZ-600To800_mu.root");
   nEvents(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root");
 
 }
