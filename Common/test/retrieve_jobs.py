@@ -46,21 +46,21 @@ def RetrieveTask(taskName, outputFileName, outDir):
 
 TaskDictionaryNameUnordered = [
 	("ttbar-powheg", "ttbar"),
-	
+
 	("WJets_HT-100To200","WJets_Ht100To200"),
 	("WJets_HT-100To200-ext1","WJets_Ht100To200-ext1"),
 	("WJets_HT-100To200-ext2","WJets_Ht100To200-ext2"),
-	
+
 	("WJets_HT-200To400","WJets_Ht200To400"),
 	("WJets_HT-200To400-ext1","WJets_Ht200To400-ext1"),
 	("WJets_HT-200To400-ext2","WJets_Ht200To400-ext2"),
-	
+
 	("WJets_HT-400To600","WJets_Ht400To600"),
 	("WJets_HT-400To600-ext","WJets_Ht400To600-ext"),
-	
+
 	("WJets_HT-600To800","WJets_Ht600To800"),
 	("WJets_HT-600To800-ext","WJets_Ht600To800-ext"),
-	
+
 	("WJets_HT-800To1200","WJets_Ht800To1200"),
 	("WJets_HT-800To1200-ext","WJets_Ht800To1200-ext"),
 
@@ -69,9 +69,9 @@ TaskDictionaryNameUnordered = [
 
 	("WJets_HT-2500ToInf","WJets_Ht2500ToInf"),
 	("WJets_HT-2500ToInf-ext","WJets_Ht2500ToInf-ext"),
-	
+
 	("WW","WW"),
-        ("WW-ext","WW-ext"),
+	("WW-ext","WW-ext"),
 
 	("WZ","WZ"),
 
