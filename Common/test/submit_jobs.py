@@ -146,15 +146,15 @@ parser.add_option('-p', '--Feature', dest="Feature", default='my_feature')
 
 
 def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDictionaryElectronChannel, DataDictionaryMuonChannel, JSONFile, YourRunRange,wantToSubmit=False):
-	for key in MCBackgroundsSampleDictionary:
-		ConfigFileName = createConfigFile(key, "mu", True, False)
-		print key, " ", ConfigFileName
-		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
+#	for key in MCBackgroundsSampleDictionary:
+#		ConfigFileName = createConfigFile(key, "mu", True, False)
+#		print key, " ", ConfigFileName
+#		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 #		ConfigFileName = createConfigFile(key, "ele", True, False)
 #		createFileForJob(key, "ele", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
-	for key in SignalMCSampleDictionary:
-		ConfigFileName = createConfigFile(key, "mu", True, True)
-		createFileForJob(key, "mu", SignalMCSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, True, wantToSubmit)
+#	for key in SignalMCSampleDictionary:
+#		ConfigFileName = createConfigFile(key, "mu", True, True)
+#		createFileForJob(key, "mu", SignalMCSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, True, wantToSubmit)
 #		ConfigFileName = createConfigFile(key, "ele", True, True)
 #		createFileForJob(key, "ele", SignalMCSampleDictionary[key], options.Feature, ConfigFileName, "crabConfigs", JSONFile, YourRunRange, True, True, wantToSubmit)
 #	for key in DataDictionaryElectronChannel:

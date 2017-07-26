@@ -789,6 +789,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Store generator level vector boson pT and diboson mass
   genPtV=0;
   genMWV=0;
+  if(isMC)
+  {
   // Scan the list of gen particles, isolate the starting W or Z, identify the hadronically decaying one and store its pt.
   for(unsigned int iGen=0; iGen<genParticles->size(); ++iGen)
   {
@@ -824,6 +826,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   genDibosonp4=genHadronicVp4+genLeptonicVp4;
   genMWV=genDibosonp4.M();
   //std::cout<<"Diboson mass: "<<genMWV<<std::endl<<std::endl;
+  }
 
   if (isMC && jecUnc == nullptr) {
     // Only have to initialise once
