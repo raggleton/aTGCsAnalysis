@@ -63,7 +63,6 @@
 #include "JetResolutionSmearer.h"
 #include "Ele27WPLooseTrigTurnOn.h"
 
-
 namespace reco {
   typedef edm::Ptr<reco::Muon> MuonPtr;
   typedef edm::Ptr<reco::GsfElectron> ElectronPtr;
@@ -85,6 +84,7 @@ private:
   virtual void endRun(edm::Run const& iEvent, edm::EventSetup const&) override;
   virtual void endJob() override;
   virtual float getPUPPIweight(float, float); 
+  virtual bool decaysHadronic(const reco::Candidate*);
  
   // ----------member data ---------------------------
   TTree* outTree_;
@@ -113,6 +113,8 @@ private:
 
   double Wplus_gen_pt, Wplus_gen_eta, Wplus_gen_phi, Wplus_gen_mass;
   double Wminus_gen_pt, Wminus_gen_eta, Wminus_gen_phi, Wminus_gen_mass;
+  ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> genHadronicVp4, genLeptonicVp4, genDibosonp4;
+  double genPtV, genMWV;
   
   int N_had_W, N_lep_W;
   int N_had_Wgen, N_lep_Wgen;
@@ -336,6 +338,9 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
      outTree_->Branch("Wminus_gen_eta",     &Wminus_gen_eta,    "Wminus_gen_eta/D"      );
      outTree_->Branch("Wminus_gen_phi",     &Wminus_gen_phi,    "Wminus_gen_phi/D"      );
      outTree_->Branch("Wminus_gen_mass",     &Wminus_gen_mass,    "Wminus_gen_mass/D"      );
+
+     outTree_->Branch("genPtV", &genPtV, "genPtV/D");
+     outTree_->Branch("genMWV", &genMWV, "genMWV/D");
    };
   if (channel == "el") {
     outTree_->Branch("bit_HLT_Ele_105",       &bit_HLT_Ele_105,     "bit_HLT_Ele_105/B"          );
@@ -780,6 +785,45 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Wminus_gen_phi = Wminus_p4.Phi();
    Wminus_gen_mass = Wminus_p4.M();
   }
+
+  // Store generator level vector boson pT and diboson mass
+  genPtV=0;
+  genMWV=0;
+  // Scan the list of gen particles, isolate the starting W or Z, identify the hadronically decaying one and store its pt.
+  for(unsigned int iGen=0; iGen<genParticles->size(); ++iGen)
+  {
+	const reco::Candidate & p= genParticles->at(iGen);
+	/*std::cout<<p.pdgId()<<" "<<p.status();
+	genHadronicVp4.SetPt(p.pt());
+        genHadronicVp4.SetEta(p.eta());
+        genHadronicVp4.SetPhi(p.phi());
+        genHadronicVp4.SetM(p.mass());
+	std::cout<<" "<<genHadronicVp4.px()<<" "<<genHadronicVp4.py()<<" "<<genHadronicVp4.pz()<<" "<<genHadronicVp4.e()<<" "<<genHadronicVp4.M()<<std::endl;*/
+	if((fabs(p.pdgId())==23 || fabs(p.pdgId())==24) && p.status()==22)
+	{
+		if(decaysHadronic(&p))
+		{
+			genPtV=p.pt();
+
+			genHadronicVp4.SetPt(p.pt());
+			genHadronicVp4.SetEta(p.eta());
+			genHadronicVp4.SetPhi(p.phi());
+			genHadronicVp4.SetM(p.mass());
+			//std::cout<<"*Hadronically decaying W* "<<genHadronicVp4.px()<<" "<<genHadronicVp4.py()<<" "<<genHadronicVp4.pz()<<" "<<genHadronicVp4.e()<<" "<<genHadronicVp4.M()<<std::endl;
+		}
+		else
+		{
+			genLeptonicVp4.SetPt(p.pt());
+			genLeptonicVp4.SetEta(p.eta());
+			genLeptonicVp4.SetPhi(p.phi());
+			genLeptonicVp4.SetM(p.mass());
+			//std::cout<<"*Leptonically decaying W* "<<genLeptonicVp4.px()<<" "<<genLeptonicVp4.py()<<" "<<genLeptonicVp4.pz()<<" "<<genLeptonicVp4.e()<<" "<<genLeptonicVp4.M()<<std::endl;
+		}
+	}
+  }
+  genDibosonp4=genHadronicVp4+genLeptonicVp4;
+  genMWV=genDibosonp4.M();
+  //std::cout<<"Diboson mass: "<<genMWV<<std::endl<<std::endl;
 
   if (isMC && jecUnc == nullptr) {
     // Only have to initialise once
@@ -1284,16 +1328,19 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    hadronicVp4.SetEta((jets -> at(0)).eta());
    hadronicVp4.SetPhi((jets -> at(0)).phi());
    hadronicVp4.SetM((jets -> at(0)).mass());
+   //std::cout<<"*Hadronically decaying W* "<<hadronicVp4.px()<<" "<<hadronicVp4.py()<<" "<<hadronicVp4.pz()<<" "<<hadronicVp4.e()<<" "<<hadronicVp4.M()<<std::endl;
    //leptonic W
    leptonicVp4.SetPt(Wboson_lep.pt);
    leptonicVp4.SetEta(Wboson_lep.eta);
    leptonicVp4.SetPhi(Wboson_lep.phi);
    leptonicVp4.SetM(Wboson_lep.mass);
-
+   //std::cout<<"*Leptonically decaying W* "<<leptonicVp4.px()<<" "<<leptonicVp4.py()<<" "<<leptonicVp4.pz()<<" "<<leptonicVp4.e()<<" "<<leptonicVp4.M()<<std::endl;
    
    lvj_p4 = hadronicVp4 + leptonicVp4;
    if (leptonicVs -> size() > 0 && jets -> size() > 0)   m_lvj = lvj_p4.M();
    else m_lvj = -99.;
+   //std::cout<<"Diboson mass: "<<m_lvj<<std::endl<<std::endl;
+   //std::cout<<"---------------------------------------"<<std::endl;
    //systematics
    //METUnclEn
    math::XYZTLorentzVector lvj_p4_Up, lvj_p4_Down;
@@ -1444,6 +1491,24 @@ float TreeMaker::getPUPPIweight(float puppipt, float puppieta){
   else totalWeight= recoCorr;
 
   return totalWeight;
+}
+
+bool TreeMaker::decaysHadronic(const reco::Candidate* p)
+{
+   if(p!=NULL)
+   {	
+	//cout<<p->pdgId()<<" ";
+	if(abs(p->pdgId())<7 || abs(p->pdgId())==21) return true;
+	else
+	{
+		for(size_t i=0; i<p->numberOfDaughters(); ++i)
+		{
+		      	const reco::Candidate* d= (reco::Candidate*)p->daughter(i);
+	               	if(decaysHadronic(d)) return true;
+		}
+	}
+   }
+   return false;	
 }
 
 void TreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup){

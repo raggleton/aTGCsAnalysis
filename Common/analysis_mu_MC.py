@@ -125,7 +125,7 @@ process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/ttbar_mu.root'),
+    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/WW_mu.root'),
 )
 
 
