@@ -121,16 +121,16 @@ BTaggingEffAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   // loop over jets
   for(PatJetCollection::const_iterator it = jets->begin(); it != jets->end(); ++it)
   {
-    int partonFlavor = it->partonFlavour();
+    int flav = it->hadronFlavour();
     bool passed;
     if( it->bDiscriminator(discriminatorTag.c_str()) >= discriminatorValue ) passed = true;
     else passed = false;
 
-    if( abs(partonFlavor)==5 )
+    if( abs(flav)==5 )
     {
       BTaggingEff_b->Fill(passed,it->pt(), it->eta());
     }
-    else if( abs(partonFlavor)==4 )
+    else if( abs(flav)==4 )
     {
       BTaggingEff_c->Fill(passed,it->pt(), it->eta());
     }
