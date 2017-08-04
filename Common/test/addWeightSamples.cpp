@@ -103,7 +103,8 @@ void addWeightSamples()
   /*addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
-  addWeight(prefix + "t-ch_ele.root", 216.99*0.33, lumi, "ele");
+  addWeight(prefix + "t-ch-top_ele.root", 136.02, lumi, "ele");
+  addWeight(prefix + "t-ch-antitop_ele.root", 80.95, lumi, "ele");
   addWeight(prefix + "tW-ch-top_ele.root", 35.6, lumi, "ele");
   addWeight(prefix + "tW-ch-antitop_ele.root", 35.6, lumi, "ele");
   addWeight(prefix + "WJets_Ht100To200_ele.root", 1345.0*1.21, lumi, "ele");
@@ -126,7 +127,8 @@ void addWeightSamples()
   addWeight(prefix + "WW_mu.root", 49.997, lumi, "");
   addWeight(prefix + "WZ_mu.root", 11.46, lumi, "");
   addWeight(prefix + "s-ch_mu.root", 10.32*0.33, lumi,"");
-  addWeight(prefix + "t-ch_mu.root", 216.99*0.33, lumi,""); 
+  addWeight(prefix + "t-ch-top_mu.root", 136.02, lumi,""); 
+  addWeight(prefix + "t-ch-antitop_mu.root", 80.95, lumi,""); 
   addWeight(prefix + "tW-ch-top_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "tW-ch-antitop_mu.root", 35.6, lumi,""); 
   addWeight(prefix + "WJets_Ht100To200_mu.root", 1345.0*1.21, lumi,""); 
