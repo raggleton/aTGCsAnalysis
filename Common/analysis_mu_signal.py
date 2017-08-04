@@ -120,7 +120,7 @@ process.analysis = cms.Path(process.GenWeights + process.NoiseFilters + process.
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/WZ-signal_mu.root'),
+    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/WW-signal_faulty_mu.root'),
 )
 
 
