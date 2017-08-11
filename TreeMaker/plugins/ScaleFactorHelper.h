@@ -1,6 +1,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TGraphAsymmErrors.h"
+
 #include <iostream>
 #include <exception>
 #include <sstream>
@@ -18,10 +19,28 @@ class ScaleFactorBase
 public:
   ScaleFactorBase(): throw_oob_(false), uid(0) {}
 
-  virtual TH1 * getHistFromFile(std::string filename, std::string object_name) {
+  virtual TObject * getObjFromFile(std::string filename, std::string object_name) {
     edm::FileInPath full_filename(filename);
     TFile file(full_filename.fullPath().c_str());
-    TH1 * hist = (TH1*)file.Get(object_name.c_str());
+    if (file.IsZombie()) {
+      throw cms::Exception("FileNotFound") << "Cannot open file " + filename;
+    }
+    TObject * obj = (TObject*)file.Get(object_name.c_str());
+    if (obj == nullptr) {
+      throw cms::Exception("InvalidObject") << "Cannot get object " + object_name + " from file " + filename;
+    }
+    return obj;
+  }
+
+  virtual TH1 * getHistFromFile(std::string filename, std::string object_name) {
+    // Ideally I'd like to just use the TObject version of this and dynamic_cast,
+    // but for some reason that seg faults.
+    edm::FileInPath full_filename(filename);
+    TFile file(full_filename.fullPath().c_str());
+    if (file.IsZombie()) {
+      throw cms::Exception("FileNotFound") << "Cannot open file " + filename;
+    }
+    TH1 * hist = (TH1*) file.Get(object_name.c_str());
     if (hist == nullptr) {
       throw cms::Exception("InvalidObject") << "Cannot get object " + object_name + " from file " + filename;
     }
@@ -72,34 +91,6 @@ public:
     return h->GetBinError(xbin_num, ybin_num);
   };
 
-  virtual TH1F * histogramFromGraph(TGraphAsymmErrors * g, const std::string & error="up") {
-    // Convert graph to a histogram. Sets bin errors to either be up or down errors
-    if (error != "up" && error != "down") throw cms::Exception("InvalidValue") << "histogramFromGraph error must be up or down";
-
-    // Setup the binning
-    std::vector<float> bins = {};
-    uint n_bins = g->GetN();
-    double * x = g->GetX();
-    double * ex_low = g->GetEXlow();
-    for (uint i = 0; i < n_bins; i++) {
-      bins.push_back(x[i] - ex_low[i]);
-    }
-    bins.push_back(x[n_bins-1] + g->GetErrorXhigh(n_bins)); // do the upper edge of the last bin
-
-    TH1F * h = new TH1F(TString::Format("hist_%d", uid), g->GetTitle(), n_bins, &bins[0]);
-    uid++;
-    h->SetDirectory(0);
-
-    // Fill the hist
-    double * y = g->GetY();
-    for (uint i=1; i <= n_bins; i++) {
-      h->SetBinContent(i, y[i-1]);
-      if (error == "up") h->SetBinError(i, g->GetErrorYhigh(i));
-      else if (error == "down") h->SetBinError(i, g->GetErrorYhigh(i));
-    }
-    return h;
-  }
-
   // TODO: template this?
   virtual std::string flatten_vector(std::vector<std::string> v, std::string delim) {
     std::stringstream s;
@@ -135,6 +126,69 @@ protected:
   int uid; // For creating hists with unique names
 };
 
+
+/**
+ * Class to handle scale factor from a TGraphAsymmErrors, since it's a pain
+ * as doesn't have convenient FindBin().
+ * Also needs to handle different up & down errors.
+ **/
+class ScaleFactorSourceTGraph : ScaleFactorBase {
+public:
+  ScaleFactorSourceTGraph(const std::string & filename, const std::string & graph_name) {
+    gr_sf.reset((TGraphAsymmErrors*) getObjFromFile(filename, graph_name));
+    hist_sf_err_up.reset(histogramFromGraph(gr_sf.get(), "up"));
+    hist_sf_err_down.reset(histogramFromGraph(gr_sf.get(), "down"));
+  }
+
+  float getScaleFactor(float xval) {
+    return getBinContent(hist_sf_err_up.get(), xval);
+  }
+
+  float getScaleFactorUncert(float xval, std::string variation) {
+    // Get error bar on graph point, `variation` can either be up or down.
+    if (variation == "up") {
+      return getBinError(hist_sf_err_up.get(), xval);
+    } else if (variation == "down") {
+      return getBinError(hist_sf_err_down.get(), xval);
+    } else {
+      throw cms::Exception("InvalidArgument") << "getScaleFactorUncert() variation must be up or down";
+    }
+  }
+
+  virtual TH1F * histogramFromGraph(TGraphAsymmErrors * g, const std::string & error="up") {
+    // Convert graph to a histogram. Sets bin errors to either be up or down errors
+    if (error != "up" && error != "down") throw cms::Exception("InvalidValue") << "histogramFromGraph error must be up or down";
+
+    // Setup the binning
+    // IMPORTANT: TGraphs are 0-indexed, whilst TH1s are 1-indexed. Insanity.
+    std::vector<float> bins = {};
+    uint n_bins = g->GetN();
+    double * x = g->GetX();
+    double * ex_low = g->GetEXlow();
+    for (uint i = 0; i < n_bins; i++) {
+      bins.push_back(x[i] - ex_low[i]);
+    }
+    bins.push_back(x[n_bins-1] + g->GetErrorXhigh(n_bins-1)); // get the upper edge of the last bin
+
+    TH1F * h = new TH1F(TString::Format("hist_%s_%s", g->GetName(), error.c_str()), g->GetTitle(), n_bins, &bins[0]);
+    h->SetDirectory(0);
+
+    // Fill the hist
+    double * y = g->GetY();
+    for (uint i=1; i <= n_bins; i++) {
+      h->SetBinContent(i, y[i-1]);
+      if (error == "up") h->SetBinError(i, g->GetErrorYhigh(i-1));
+      else if (error == "down") h->SetBinError(i, g->GetErrorYlow(i-1));
+    }
+    return h;
+  }
+
+private:
+  std::unique_ptr<TGraphAsymmErrors> gr_sf;
+  std::unique_ptr<TH1F> hist_sf_err_up;  // use to hold graph data but with bin error = upwards error
+  std::unique_ptr<TH1F> hist_sf_err_down;  // ditto with bin error = downwards error
+};
+
 /**
  * Specific implementation for Muons
  * Note that one instance of this class is designed for one specific ID/ISO working point
@@ -163,13 +217,9 @@ public:
 
     // This is a bit of a hack - to easily retrieve the scale factors & errors, we first convert
     // our graph into a histogram, since TGraph doesn't have a simple FindBin().
-    gr_tracking_sf_eta.reset((TGraphAsymmErrors*) getHistFromFile(tracking_sf_filename, "ratio_eff_eta3_dr030e030_corr"));
-    hist_tracking_sf_eta_err_up.reset(histogramFromGraph(gr_tracking_sf_eta.get(), "up"));
-    hist_tracking_sf_eta_err_down.reset(histogramFromGraph(gr_tracking_sf_eta.get(), "down"));
-
-    gr_tracking_sf_nPV.reset((TGraphAsymmErrors*) getHistFromFile(tracking_sf_filename, "ratio_eff_vtx_dr030e030_corr"));
-    hist_tracking_sf_nPV_err_up.reset(histogramFromGraph(gr_tracking_sf_nPV.get(), "up"));
-    hist_tracking_sf_nPV_err_down.reset(histogramFromGraph(gr_tracking_sf_nPV.get(), "down"));
+    // Using getHistFromFile() on a TGraph is a bit of a hack, but casting the ptr seems to work...
+    tracking_sf_eta.reset(new ScaleFactorSourceTGraph(tracking_sf_filename, "ratio_eff_eta3_dr030e030_corr"));
+    tracking_sf_nPV.reset(new ScaleFactorSourceTGraph(tracking_sf_filename, "ratio_eff_vtx_dr030e030_corr"));
 
     hist_id_sf_nPV.reset((TH1F*) getHistFromFile(id_sf_filename, "MC_NUM_"+id+"_DEN_genTracks_PAR_vtx/tag_nVertices_ratio"));
     std::string pt_eta_hist_name = "pt_abseta_ratio";
@@ -192,30 +242,20 @@ public:
   const float systematic_Iso = 0.005;
   const float systematic_Trigger = 0.005;
 
-  float getTrackingScaleFactor(float eta, float phi, int nVertices) {
+  float getTrackingScaleFactor(float eta, int nVertices) {
     // NB although lumi and/or phi graphs in ROOT files, only recommended to use eta & nPV
     // (prob wise to check this periodically)
-    float eta_sf = getBinContent(hist_tracking_sf_eta_err_up.get(), eta);
-    float npv_sf = getBinContent(hist_tracking_sf_nPV_err_up.get(), nVertices);
-    return eta_sf * npv_sf;
+    return tracking_sf_eta->getScaleFactor(eta) * tracking_sf_nPV->getScaleFactor(nVertices);
   };
 
-  float getTrackingScaleFactorUncert(float eta, float phi, int nVertices, const std::string & variation) {
+  float getTrackingScaleFactorUncert(float eta, int nVertices, const std::string & variation) {
     // Get statistical + systematic uncertainty on SF
     // Tracking SF are the only ones that come with different up/down errors
+    float eta_sf = tracking_sf_eta->getScaleFactor(eta);
+    float npv_sf = tracking_sf_nPV->getScaleFactor(nVertices);
+    float eta_sf_uncert = tracking_sf_eta->getScaleFactorUncert(eta, variation);
+    float npv_sf_uncert = tracking_sf_nPV->getScaleFactorUncert(nVertices, variation);
 
-    // Central values don't depend on the up/down error so doesn't matter which hist we use
-    float eta_sf = getBinContent(hist_tracking_sf_eta_err_up.get(), eta);
-    float npv_sf = getBinContent(hist_tracking_sf_nPV_err_up.get(), nVertices);
-
-    float eta_sf_uncert(0.), npv_sf_uncert(0.);
-    if (variation == "up") {
-      eta_sf_uncert = getBinError(hist_tracking_sf_eta_err_up.get(), eta);
-      npv_sf_uncert = getBinError(hist_tracking_sf_nPV_err_up.get(), nVertices);
-    } else if (variation == "down") {
-      eta_sf_uncert = getBinError(hist_tracking_sf_eta_err_down.get(), eta);
-      npv_sf_uncert = getBinError(hist_tracking_sf_nPV_err_down.get(), nVertices);
-    }
     std::vector<std::pair<float, float>> vals = {
       std::make_pair(eta_sf, eta_sf_uncert),
       std::make_pair(npv_sf, npv_sf_uncert),
@@ -282,14 +322,14 @@ public:
     // Variation here is SF +/- uncertainty, where uncertainty is BOTH statistical & systematic
     // Systematic variations may need updating as necessary, see
     // https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffsRun2
-    float tracking_sf = getTrackingScaleFactor(eta, phi, nVertices);
+    float tracking_sf = getTrackingScaleFactor(eta, nVertices);
     float id_sf = getIDScaleFactor(pt, eta, nVertices);
     float iso_sf = getIsoScaleFactor(pt, eta, nVertices);
     float trigger_sf = getTriggerScaleFactor(pt, eta);
     float total_var = 0;
     if (variation == "up" || variation == "down") {
       std::vector<std::pair<float, float>> vals = {
-        std::make_pair(tracking_sf, getTrackingScaleFactorUncert(eta, phi, nVertices, variation)),
+        std::make_pair(tracking_sf, getTrackingScaleFactorUncert(eta, nVertices, variation)),
         std::make_pair(id_sf, getIDScaleFactorUncert(pt, eta, nVertices)),
         std::make_pair(iso_sf, getIsoScaleFactorUncert(pt, eta, nVertices)),
         std::make_pair(trigger_sf, getTriggerScaleFactorUncert(pt, eta))
@@ -305,12 +345,8 @@ public:
   };
 
 private:
-  std::unique_ptr<TGraphAsymmErrors> gr_tracking_sf_eta;
-  std::unique_ptr<TH1F> hist_tracking_sf_eta_err_up; // used to hold graph data, with bin error = graph up error
-  std::unique_ptr<TH1F> hist_tracking_sf_eta_err_down; // similar but bin error = graph down error
-  std::unique_ptr<TGraphAsymmErrors> gr_tracking_sf_nPV;
-  std::unique_ptr<TH1F> hist_tracking_sf_nPV_err_up;
-  std::unique_ptr<TH1F> hist_tracking_sf_nPV_err_down;
+  std::unique_ptr<ScaleFactorSourceTGraph> tracking_sf_eta;
+  std::unique_ptr<ScaleFactorSourceTGraph> tracking_sf_nPV;
 
   std::unique_ptr<TH1F> hist_id_sf_nPV;
   std::unique_ptr<TH2F> hist_id_sf_pt_eta;
@@ -322,14 +358,121 @@ private:
 };
 
 
+/**
+ * Specific implementation for Electron SF
+ **/
 class ElectronScaleFactor : ScaleFactorBase {
 public:
-  ElectronScaleFactor() {};
+  ElectronScaleFactor(const std::string & heep_sf_filename, const std::string & reco_sf_filename) {
+    heep_sf_nPV_barrel.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Nvtx_Barrel"));
+    heep_sf_nPV_endcap.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Nvtx_Endcap"));
+    heep_sf_et_barrel.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Et_Barrel"));
+    heep_sf_et_endcap.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Et_Endcap"));
+    heep_sf_phi_barrel.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Phi_Barrel"));
+    heep_sf_phi_endcap.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Phi_Endcap"));
+    heep_sf_eta.reset(new ScaleFactorSourceTGraph(heep_sf_filename, "SF_Eta_Ordered"));
+    reco_sf_eta.reset(new ScaleFactorSourceTGraph(reco_sf_filename, "grSF1D_0_Ordered"));
+  };
 
-  float getScaleFactor();
+  float getScaleFactor(float et, float eta, float sc_eta, float phi, int nVertices, const std::string & variation="") {
+    // Get total HEEP + RECO SF, optionally with combined stat and systematic uncert added/subtracted
+    ScaleFactorSourceTGraph *sfs_nPV, *sfs_et, *sfs_phi;
+    float heep_syst_uncert(0.);
+
+    if (fabs(eta) <= BARREL_ETA_MAX) {
+      sfs_nPV = heep_sf_nPV_barrel.get();
+      sfs_et = heep_sf_et_barrel.get();
+      sfs_phi = heep_sf_phi_barrel.get();
+
+      // HEEP Syst uncert as recommended by EGamma POG:
+      // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Electron_efficiencies_and_scale
+      if (et < 90) {
+        heep_syst_uncert = 0.01;
+      } else if (et < 1000) {
+        heep_syst_uncert = 0.02;
+      } else {
+        heep_syst_uncert = 0.03;
+      }
+    } else {
+      sfs_nPV = heep_sf_nPV_endcap.get();
+      sfs_et = heep_sf_et_endcap.get();
+      sfs_phi = heep_sf_phi_endcap.get();
+
+      // Syst uncert
+      if (et < 90) {
+        heep_syst_uncert = 0.01;
+      } else if (et < 300) {
+        heep_syst_uncert = 0.02;
+      } else {
+        heep_syst_uncert = 0.04;
+      }
+    }
+
+    float eta_sf = heep_sf_eta->getScaleFactor(eta);
+    float nPV_sf = sfs_nPV->getScaleFactor(nVertices);
+    float et_sf = sfs_et->getScaleFactor(et);
+    float phi_sf = sfs_phi->getScaleFactor(phi);
+    float reco_sf = reco_sf_eta->getScaleFactor(sc_eta);
+
+    float total_sf = eta_sf * nPV_sf * et_sf * phi_sf * reco_sf;
+
+    if (variation == "") {
+      return total_sf;
+    }
+
+    // Stat uncerts:
+    std::vector<std::pair<float, float>> vals = {
+      std::make_pair(eta_sf, heep_sf_eta->getScaleFactorUncert(eta, variation)),
+      std::make_pair(nPV_sf, sfs_nPV->getScaleFactorUncert(nVertices, variation)),
+      std::make_pair(et_sf, sfs_et->getScaleFactorUncert(et, variation)),
+      std::make_pair(phi_sf, sfs_phi->getScaleFactorUncert(phi, variation)),
+    };
+
+    float heep_stat_uncert = propagateUncert(vals);
+
+    float reco_stat_uncert = reco_sf_eta->getScaleFactorUncert(sc_eta, variation);
+
+    // Systematic uncerts:
+    // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Electron_efficiencies_and_scale
+    // HEEP SF systematic
+    float heep_sf = (eta_sf * nPV_sf * et_sf * phi_sf);
+    heep_syst_uncert *= heep_sf;
+
+    // RECO SF systematic
+    float reco_syst_uncert = (et>80) ? 0.01 * reco_sf : 0.;
+
+    // Calc total uncert
+    // To do this, we consider the HEEP and RECO SF separately, since each
+    // has its own stat and syst uncertainties
+    // These are each combined in quadrature to give 1 uncertainty to each SF,
+    // and then they are propagated for the final SF.
+    float heep_uncert = std::hypot(heep_stat_uncert, heep_syst_uncert);
+    float reco_uncert = std::hypot(reco_stat_uncert, reco_syst_uncert);
+
+    float total_uncert = propagateUncert(std::vector<std::pair<float, float>> {
+      std::make_pair(heep_sf, heep_uncert),
+      std::make_pair(reco_sf, reco_uncert)
+    });
+
+    if (variation == "down") {
+        total_uncert *= -1;
+    }
+    return total_sf + total_uncert;
+  };
 
 private:
-  TH1F * tracking_sf;
-  TH1F * id_sf;
-  TH1F * iso_sf;
+  const float BARREL_ETA_MAX = 1.4442;
+
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_nPV_barrel;
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_nPV_endcap;
+
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_et_barrel;
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_et_endcap;
+
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_phi_barrel;
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_phi_endcap;
+
+  std::unique_ptr<ScaleFactorSourceTGraph> heep_sf_eta;
+
+  std::unique_ptr<ScaleFactorSourceTGraph> reco_sf_eta;
 };

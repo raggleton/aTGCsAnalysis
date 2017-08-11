@@ -211,6 +211,7 @@ private:
   edm::EDGetTokenT<LHERunInfoProduct> lheProducerToken;
   SystematicsHelper SystematicsHelper_;
   MuonScaleFactor MuonScaleFactor_;
+  ElectronScaleFactor ElectronScaleFactor_;
   JetResolutionSmearer<pat::Jet>JetResolutionSmearer_;
   BTagHelper BTagHelper_;
   // For PUPPI Softdrop Mass Correction
@@ -245,6 +246,10 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     "aTGCsAnalysis/TreeMaker/data/Muon_SingleLeptonTriggerSF_average_RunBtoH.root",
     "HighPtID",
     "tkLooseISO"
+  ),
+  ElectronScaleFactor_(
+    "aTGCsAnalysis/TreeMaker/data/HEEP_SF.root",
+    "aTGCsAnalysis/TreeMaker/data/egammaEffi.txt_EGM2D.root"
   ),
   JetResolutionSmearer_(iConfig.getParameter<bool>("isMC")),
   BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
@@ -886,8 +891,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        Lepton.pt_LeptonResUp = LeptonSystMap.at("LeptonResUp").Pt();
        Lepton.pt_LeptonResDown = LeptonSystMap.at("LeptonResDown").Pt();
     }
-   }    
-   else 
+   }
+   else
    {
      Lepton.pt = -99.;
      Lepton.eta = -99.;
@@ -897,16 +902,16 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Lepton.pt_LeptonResUp = -99.;
      Lepton.pt_LeptonResDown = -99.;
    }
-   
+
    if (channel == "mu"){
       LeptonSF = MuonScaleFactor_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), Lepton.phi, nPV);
       LeptonSF_Up = MuonScaleFactor_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), Lepton.phi, nPV, "up");
       LeptonSF_Down = MuonScaleFactor_.getScaleFactor(Lepton.pt, std::abs(Lepton.eta), Lepton.phi, nPV, "down");
     }
    else if (channel == "el") {
-      LeptonSF = isEB?0.994:0.993;//slide 27: https://indico.cern.ch/event/482671/contributions/2154184/attachments/1268166/1878158/HEEP_ScaleFactor_Study_v4.pdf
-      LeptonSF_Up =  LeptonSF;
-      LeptonSF_Down =  LeptonSF;
+      LeptonSF = ElectronScaleFactor_.getScaleFactor(Lepton.pt, Lepton.eta, sc_eta, Lepton.phi, nPV);
+      LeptonSF_Up = ElectronScaleFactor_.getScaleFactor(Lepton.pt, Lepton.eta, sc_eta, Lepton.phi, nPV, "up");
+      LeptonSF_Down = ElectronScaleFactor_.getScaleFactor(Lepton.pt, Lepton.eta, sc_eta, Lepton.phi, nPV, "down");
     }
    //leptonically decaying W
    if (leptonicVs -> size() > 0)

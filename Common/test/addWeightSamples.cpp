@@ -69,20 +69,20 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
   for (unsigned int iEntry = 0; iEntry < tree -> GetEntries(); iEntry ++)
   {
     tree -> GetEntry(iEntry); 
-    if (channel == "ele"){
-      totWeightWithLumi = totWeight*weightLumi/triggerWeightHLTEle27NoER;
-      totWeightWithLumi_BTagUp = totWeight_BTagUp*weightLumi/triggerWeightHLTEle27NoER;
-      totWeightWithLumi_BTagDown = totWeight_BTagDown*weightLumi/triggerWeightHLTEle27NoER;
-      totWeightWithLumi_MistagUp= totWeight_MistagUp*weightLumi/triggerWeightHLTEle27NoER;
-      totWeightWithLumi_MistagDown = totWeight_MistagDown*weightLumi/triggerWeightHLTEle27NoER;
-    }
-    else { 
+    // if (channel == "ele"){
+    //   totWeightWithLumi = totWeight*weightLumi/triggerWeightHLTEle27NoER;
+    //   totWeightWithLumi_BTagUp = totWeight_BTagUp*weightLumi/triggerWeightHLTEle27NoER;
+    //   totWeightWithLumi_BTagDown = totWeight_BTagDown*weightLumi/triggerWeightHLTEle27NoER;
+    //   totWeightWithLumi_MistagUp= totWeight_MistagUp*weightLumi/triggerWeightHLTEle27NoER;
+    //   totWeightWithLumi_MistagDown = totWeight_MistagDown*weightLumi/triggerWeightHLTEle27NoER;
+    // }
+    // else { 
       totWeightWithLumi = totWeight*weightLumi;
       totWeightWithLumi_BTagUp = totWeight_BTagUp*weightLumi;
       totWeightWithLumi_BTagDown = totWeight_BTagDown*weightLumi;
       totWeightWithLumi_MistagUp= totWeight_MistagUp*weightLumi;
       totWeightWithLumi_MistagDown = totWeight_MistagDown*weightLumi;
-    }
+    // }
     br -> Fill();
     br_MistagUp -> Fill();
     br_MistagDown -> Fill();
@@ -100,7 +100,7 @@ void addWeightSamples()
   std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/";
 
   //electron channel
-  /*addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
+  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
   addWeight(prefix + "t-ch-top_ele.root", 136.02, lumi, "ele");
@@ -117,12 +117,12 @@ void addWeightSamples()
   addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");
 
   // The cross sections are from the GenXSecAnalyzer and multiplying factors are required to match the SM yield to the SM samples.
-  addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", insertXSec, lumi, "ele");
-  addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", insertXSec, lumi, "ele");
-  addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", insertXSec, lumi, "ele");
-  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", insertXSec, lumi, "ele");
-*/
-  
+  // addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", insertXSec, lumi, "ele");
+  // addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", insertXSec, lumi, "ele");
+  // addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", insertXSec, lumi, "ele");
+  // addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", insertXSec, lumi, "ele");
+
+
   //muon channel
   addWeight(prefix + "WW_mu.root", 49.997, lumi, "");
   addWeight(prefix + "WZ_mu.root", 11.46, lumi, "");
