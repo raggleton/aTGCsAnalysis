@@ -1484,10 +1484,15 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     totWeight_MistagUp *= triggerWeightHLTEle27NoER; 
     totWeight_MistagDown *= triggerWeightHLTEle27NoER;
   }*/
- 
-  outTree_->Fill();
 
-
+  if(isSignal)
+  {
+	if(aTGCWeights.size()>=124) outTree_->Fill();
+  }
+  else
+  {
+	outTree_->Fill();
+  }
 
 }
 

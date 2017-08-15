@@ -357,7 +357,7 @@ void Plotter::Plotting(std::string OutPrefix_)
            SMhistsScale.push_back(temp);
       }
       // fill variables
-      if(aTGCWeights->size()<124){std::cout<<"Entry in tree: "<<jentry<<" Number of faulty entries: "<<zeros++<<" aTGCWeights size: "<<aTGCWeights->size()<<std::endl;for(int i=aTGCWeights->size();i<124;i++)aTGCWeights->push_back(0);}
+      // if(aTGCWeights->size()<124){std::cout<<"Entry in tree: "<<jentry<<" Number of faulty entries: "<<zeros++<<" aTGCWeights size: "<<aTGCWeights->size()<<std::endl;for(int i=aTGCWeights->size();i<124;i++)aTGCWeights->push_back(0);}
       for(auto var = variables.begin(); var != variables.end() ; var++)
       {
 	       std::string vname = var->VarName;
