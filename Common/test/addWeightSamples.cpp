@@ -100,7 +100,7 @@ void addWeightSamples()
   std::string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/";
 
   //electron channel
-  addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
+  /*addWeight(prefix + "WW_ele.root", 49.997, lumi, "ele");
   addWeight(prefix + "WZ_ele.root", 11.46, lumi, "ele");
   addWeight(prefix + "s-ch_ele.root", 10.32*0.33, lumi, "ele");
   addWeight(prefix + "t-ch-top_ele.root", 136.02, lumi, "ele");
@@ -117,10 +117,10 @@ void addWeightSamples()
   addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");
 
   // The cross sections are from the GenXSecAnalyzer and multiplying factors are required to match the SM yield to the SM samples.
-  // addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", insertXSec, lumi, "ele");
-  // addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", insertXSec, lumi, "ele");
-  // addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", insertXSec, lumi, "ele");
-  // addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", insertXSec, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", insertXSec, lumi, "ele");*/
 
 
   //muon channel
@@ -141,9 +141,9 @@ void addWeightSamples()
   addWeight(prefix + "ttbar_mu.root", 831.76, lumi,"");
 
   // The cross sections are from the GenXSecAnalyzer and multiplying factors are required to match the SM yield to the SM samples.
-  addWeight(prefix + "WW-aTGC_MWW-600To800_mu.root", 0.1833 * 4.07, lumi, "");
-  addWeight(prefix + "WW-aTGC_MWW-800ToInf_mu.root", 0.2366 * 3.395, lumi, "");
-  addWeight(prefix + "WZ-aTGC_MWZ-600To800_mu.root", 0.06493 * 16.75, lumi, "");  
-  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root", 0.1012 * 10.56, lumi, "");
+  addWeight(prefix + "WW-aTGC_MWW-600To800_mu.root", 0.1833 * 3.77, lumi, "");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_mu.root", 0.2366 * 3.179, lumi, "");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_mu.root", 0.06493 * 15.61, lumi, "");  
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root", 0.1012 * 9.959, lumi, "");
 
 }
