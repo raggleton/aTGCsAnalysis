@@ -5,10 +5,11 @@ Run this script to create crab configs for btagging efficiency files,
 and optionally submit them.
 """
 
-
+import os
 from subprocess import check_call
 from itertools import product
 
+FEATURE_NAME = "btag_eff_withLeptonSF"
 
 # set True to actually submit jobs to crab
 SUBMIT_JOBS = True
@@ -29,6 +30,10 @@ def create_crab_config(request_name, cmssw_config_file, dataset, units_per_job, 
     if "{" in crab_template or "}" in crab_template:
         raise RuntimeError("Failed to create crab config contents:\n %s" % crab_template)
 
+    output_dir = os.path.dirname(os.path.abspath(output_filename))
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+
     with open(output_filename, "w") as out_f:
         out_f.write(crab_template)
 
@@ -42,7 +47,7 @@ if __name__ == "__main__":
     # Channels to run over, and corresponding config file
     channels = [
         {"name": "mu", "config": "../btageff_mu.py"},
-        # {"name": "ele", "config": "../btageff_ele.py"}
+        {"name": "ele", "config": "../btageff_ele.py"}
     ]
 
     # Datasets you want to run over. Can optionally specify units_per_job for each
@@ -94,8 +99,8 @@ if __name__ == "__main__":
     default_files_per_job = 2
 
     for c_dict, s_dict in product(channels, samples):
-        output_filename = "crab-%s-%s.py" % (s_dict['name'], c_dict['name'])
-        create_crab_config(request_name="%s_btag_eff_%s" % (s_dict['name'], c_dict['name']),
+        output_filename = FEATURE_NAME + "/crab-%s-%s.py" % (s_dict['name'], c_dict['name'])
+        create_crab_config(request_name="%s_%s_%s" % (s_dict['name'], FEATURE_NAME, c_dict['name']),
                            cmssw_config_file=c_dict['config'],
                            dataset=s_dict['dataset'],
                            units_per_job=s_dict.get("units_per_job", default_files_per_job),
