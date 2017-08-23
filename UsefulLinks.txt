@@ -49,6 +49,10 @@ https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#JER_Scaling_factors_a
 # GenXSecAnalyzer Tool (for computing cross sections for signal samples)
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/HowToGenXSecAnalyzer
 
+# Signal sample cards (reweight cards e.g.)
+https://github.com/cms-sw/genproductions/tree/master/bin/MadGraph5_aMCatNLO/cards/production/13TeV/AnomalousCouplings-SMP/WWTolnujj_01j_aTGC_semilep_Wpt_WVmass_4f_NLO_FXFX
+https://github.com/cms-sw/genproductions/tree/master/bin/MadGraph5_aMCatNLO/cards/production/13TeV/AnomalousCouplings-SMP/WZTolnujj_01j_aTGC_semilep_Zpt_WVmass_5f_NLO_FXFX
+
 # Combined Limit Tool
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit
 
