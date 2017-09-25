@@ -54,7 +54,7 @@ public:
 			reader_down->load(calib, BTagEntry::FLAV_B, "mujets");
 			reader_down->load(calib, BTagEntry::FLAV_C, "mujets");
 			reader_down->load(calib, BTagEntry::FLAV_UDSG, "incl");
-			MaxBJetPt = 669.9;
+			MaxBJetPt = 1000;
 			//get measured efficiencies
 			TFile effFile(EfficiencyFile.fullPath().c_str());
 			eff_b = (TEfficiency*)effFile.Get("BtagAnalyzer/BTaggingEff_b");
