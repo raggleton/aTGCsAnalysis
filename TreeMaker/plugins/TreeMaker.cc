@@ -652,9 +652,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<edm::View<pat::Jet> > jets; 
    iEvent.getByToken(fatJetsToken_, jets);
    
-   //JAK4 ets (for Btag veto )
+   //AK4 Jets (for Btag veto )
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
    iEvent.getByToken(AK4JetsToken_, AK4Jets);
+   njets = AK4Jets->size();
    
    //MET
    edm::Handle<edm::View<pat::MET> > metHandle;
@@ -1260,7 +1261,6 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else throw cms::Exception("InvalidValue") << "This shouldn't happen, we require at least 1 jet, but the size of the jet collection for this event is zero!" << std::endl; 
   
   //Loop over the collection of the AK4 jets which contain b-tagging information (to veto b-jets)
-  njets = AK4Jets -> size(); 
   nbtag = 0;
   if(isMC){
     jetFlavours.clear();
