@@ -707,6 +707,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //btag weights
    if (njets > 0) {
      btagWeight =  BTagHelper_.getEventWeight(AK4Jets);
+     if (btagWeight != btagWeight) {
+      std::cout << "Event: " << nevent << " LS: " << lumi << std::endl;
+      throw std::runtime_error("Inf/NaN btagWeight for event ");
+     }
      btagWeight_BTagUp =  BTagHelper_.getEventWeight(AK4Jets, UP, BTAG);
      btagWeight_BTagDown =  BTagHelper_.getEventWeight(AK4Jets, DOWN, BTAG);
      btagWeight_MistagUp =  BTagHelper_.getEventWeight(AK4Jets, UP, MISTAG);
