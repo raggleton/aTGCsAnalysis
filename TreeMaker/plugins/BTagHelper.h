@@ -66,36 +66,37 @@ public:
 	}
 	template<class T> double getScaleFactor(T jet, VARIATION var=NOMINAL, BTagUncertaintyType BTagUncertaintyType_=NOMINALTYPE){
 		float jetPt = jet.pt();
+		uint flav = abs(jet.hadronFlavour());
       	if (jetPt>MaxBJetPt) jetPt = MaxBJetPt;
       	double jet_scalefactor;
       	if (var == NOMINAL){
       		if (BTagUncertaintyType_ != NOMINALTYPE) throw cms::Exception("InvalidValue") << "BTagUncertaintyType is not valid, should be NOMINALTYPE in this case." << std::endl;
-	      	if (jet.partonFlavour() == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
-	      	else if (jet.partonFlavour() == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
+	      	if (flav == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
+	      	else if (flav == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
 	      	else jet_scalefactor = reader->eval(BTagEntry::FLAV_UDSG, jet.eta(), jetPt);
 	      }
 	    else if (var == UP){
 	    	if (BTagUncertaintyType_ == BTAG){
-	    		if (jet.partonFlavour() == 5) jet_scalefactor = reader_up->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
-	      		else if (jet.partonFlavour() == 4) jet_scalefactor = reader_up->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
+	    		if (flav == 5) jet_scalefactor = reader_up->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
+	      		else if (flav == 4) jet_scalefactor = reader_up->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
 	      		else jet_scalefactor = reader->eval(BTagEntry::FLAV_UDSG, jet.eta(), jetPt);
 	      	}
 	      	else if (BTagUncertaintyType_ == MISTAG){
-	    		if (jet.partonFlavour() == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
-	      		else if (jet.partonFlavour() == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
+	    		if (flav == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
+	      		else if (flav == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
 	      		else jet_scalefactor = reader_up->eval(BTagEntry::FLAV_UDSG, jet.eta(), jetPt);
 	      	}
 	      	else throw cms::Exception("InvalidValue") << "BTagUncertaintyType is not valid." << std::endl;
 	    }
 	    else if (var == DOWN){
 	    	if (BTagUncertaintyType_ == BTAG){
-	    		if (jet.partonFlavour() == 5) jet_scalefactor = reader_down->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
-	      		else if (jet.partonFlavour() == 4) jet_scalefactor = reader_down->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
+	    		if (flav == 5) jet_scalefactor = reader_down->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
+	      		else if (flav == 4) jet_scalefactor = reader_down->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
 	      		else jet_scalefactor = reader->eval(BTagEntry::FLAV_UDSG, jet.eta(), jetPt);
 	      	}
 	      	else if (BTagUncertaintyType_ == MISTAG){
-	    		if (jet.partonFlavour() == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
-	      		else if (jet.partonFlavour() == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
+	    		if (flav == 5) jet_scalefactor = reader->eval(BTagEntry::FLAV_B, jet.eta(), jetPt);
+	      		else if (flav == 4) jet_scalefactor = reader->eval(BTagEntry::FLAV_C, jet.eta(), jetPt);
 	      		else jet_scalefactor = reader_down->eval(BTagEntry::FLAV_UDSG, jet.eta(), jetPt);
 	      	}
 	      	else throw cms::Exception("InvalidValue") << "BTagUncertaintyType is not valid." << std::endl;
@@ -109,9 +110,10 @@ public:
 		int etaBin = hist_eff ->GetYaxis() -> FindBin(jet.eta());
 		if (jet.pt() >= hist_eff -> GetXaxis() -> GetBinUpEdge(hist_eff -> GetNbinsX()) ) ptBin =  hist_eff -> GetNbinsX();//protection in case we go above the binning limit
 		double efficiency;
-		if(jet.partonFlavour() == 5) efficiency = eff_b->GetEfficiency(eff_b->GetGlobalBin(ptBin,etaBin));
-		else if(jet.partonFlavour() == 4) efficiency = eff_c->GetEfficiency(eff_c->GetGlobalBin(ptBin,etaBin));
-		else  efficiency = eff_udsg->GetEfficiency(eff_udsg->GetGlobalBin(ptBin,etaBin));
+		uint flav = abs(jet.hadronFlavour());
+		if (flav == 5) efficiency = eff_b->GetEfficiency(eff_b->GetGlobalBin(ptBin,etaBin));
+		else if (flav == 4) efficiency = eff_c->GetEfficiency(eff_c->GetGlobalBin(ptBin,etaBin));
+		else efficiency = eff_udsg->GetEfficiency(eff_udsg->GetGlobalBin(ptBin,etaBin));
 		return efficiency;
 	}
 	template<class T> double getEventWeight(edm::Handle<edm::View<T>> jets, VARIATION var=NOMINAL, BTagUncertaintyType BTagUncertaintyType_=NOMINALTYPE){
