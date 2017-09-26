@@ -217,7 +217,7 @@ private:
   // For PUPPI Softdrop Mass Correction
   TF1 *puppisd_corrGEN, *puppisd_corrRECO_cen, *puppisd_corrRECO_for;
   JetCorrectionUncertainty * jecUnc;
-
+  double bTagDiscrCut;
 };
 
 //
@@ -252,7 +252,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     "aTGCsAnalysis/TreeMaker/data/egammaEffi.txt_EGM2D.root"
   ),
   JetResolutionSmearer_(iConfig.getParameter<bool>("isMC")),
-  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"), iConfig.getParameter<double>("BtagDiscrCut"))
+  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"), iConfig.getParameter<double>("BtagDiscrCut")),
+  bTagDiscrCut(iConfig.getParameter<double>("BtagDiscrCut"))
 {
 
   if ((channel != "mu") && (channel != "el")) {
@@ -1305,7 +1306,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (unsigned int iBtag = 0; iBtag < AK4Jets -> size(); iBtag ++)
   {
     //taken from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X#Supported_Algorithms_and_Operati
-    if(((AK4Jets -> at(iBtag)).bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > 0.935){
+    if(((AK4Jets -> at(iBtag)).bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
      nbtag ++;
     }
     if(isMC)jetFlavours.push_back((AK4Jets -> at(iBtag)).partonFlavour());
