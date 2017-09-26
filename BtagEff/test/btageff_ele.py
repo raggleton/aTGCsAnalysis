@@ -1,6 +1,8 @@
 import FWCore.ParameterSet.Config as cms
+
 from aTGCsAnalysis.SystematicsProducers.metSystematics_cff import *
-process = cms.Process( "aTGCanalysis" )
+
+process = cms.Process( "BtagEff" )
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10000)
 )
@@ -29,7 +31,6 @@ process.NoiseFilters = cms.EDFilter("NoiseFilter",
             noiseFilter = cms.InputTag("TriggerResults", "", "PAT"),
             filterNames = cms.vstring("Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter",  "Flag_globalTightHalo2016Filter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_goodVertices", "Flag_eeBadScFilter") 
             )
-
 
 #
 # Set up electron ID (VID framework)
@@ -71,7 +72,8 @@ process.MuonVeto = cms.EDFilter("LeptonVeto",
                                     maxNTight = cms.int32(0),
            )
 
-process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto +  process.leptonicWtoenuSequenceMC )
+# Note, using leptonicWtoenuSequenceData as we only want the reco'd W, not all the up/down variations
+process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto +  process.leptonicWtoenuSequenceData )
 
 process.jetFilter = cms.EDFilter("CandViewCountFilter",
                                  src = cms.InputTag("goodJets"),
@@ -88,11 +90,21 @@ doMetCorrections(process, isData=False, runBtoF=False)
 
 
 process.BtagAnalyzer = cms.EDAnalyzer("BTaggingEffAnalyzer",
+                                      channel = cms.string("el"),
+                                      vertexSrc = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                                      leptonSrc = cms.InputTag("tightElectrons"),
+                                      leptonicVSrc = cms.InputTag("Wtoenu"),
+                                      metSrc = cms.InputTag("METele"),
                                       JetsTag = cms.InputTag("goodAK4Jets"),
+                                      fatJetSrc = cms.InputTag("goodJets"),
                                       DiscriminatorTag = cms.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
                                       DiscriminatorValue = cms.double(0.9535),
                                       ptBinning = cms.vdouble(20., 30., 50., 70., 100., 140., 200., 300., 600., 1000.),
-                                      etaBinning = cms.vdouble(-2.4, 2.4)
+                                      etaBinning = cms.vdouble(-2.4, 2.4),
+                                      METCut = cms.double(80.),
+                                      leptonPtCut = cms.double(50.),
+                                      WPtCut = cms.double(200.),
+                                      MWWCut = cms.double(900.)
                                     )
 
 # PATH
@@ -101,7 +113,7 @@ process.analysis = cms.Path(process.NoiseFilters  + process.BadChargedCandidateF
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:///afs/cern.ch/user/i/ishvetso/eos/cms/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/002825F6-8D1E-E611-8276-002481E94B26.root'),
+    fileNames = cms.untracked.vstring('file:/pnfs/desy.de/cms/tier2/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/08BA365D-40E5-E611-955F-00266CF89498.root'),
 
 )
 
@@ -109,5 +121,5 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.TFileService = cms.Service("TFileService",
-                                 fileName = cms.string("tree_ele.root")
+                                 fileName = cms.string("btag_tree_ele.root")
                                   )

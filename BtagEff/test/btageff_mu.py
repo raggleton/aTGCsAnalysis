@@ -72,8 +72,8 @@ process.MuonVeto = cms.EDFilter("LeptonVeto",
                                     maxNTight = cms.int32(1),
            )
 
-
-process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto +  process.leptonicWtomunuSequenceMC )
+# Note, using leptonicWtomunuSequenceData as we only want the reco'd W, not all the up/down variations
+process.leptonSequence = cms.Sequence(process.muSequence + process.eleSequence + process.ElectronVeto + process.MuonVeto +  process.leptonicWtomunuSequenceData )
 
 process.jetFilter = cms.EDFilter("CandViewCountFilter",
                                  src = cms.InputTag("goodJets"),
@@ -89,11 +89,21 @@ from aTGCsAnalysis.Common.MET_cff import doMetCorrections
 doMetCorrections(process, isData=False, runBtoF=False)
 
 process.BtagAnalyzer = cms.EDAnalyzer("BTaggingEffAnalyzer",
+                                      channel = cms.string("mu"),
+                                      vertexSrc = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                                      leptonSrc = cms.InputTag("tightMuons"),
+                                      leptonicVSrc = cms.InputTag("Wtomunu"),
+                                      metSrc = cms.InputTag("METmu"),
                                       JetsTag = cms.InputTag("goodAK4Jets"),
+                                      fatJetSrc = cms.InputTag("goodJets"),
                                       DiscriminatorTag = cms.string("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
                                       DiscriminatorValue = cms.double(0.9535),
                                       ptBinning = cms.vdouble(20., 30., 50., 70., 100., 140., 200., 300., 600., 1000.),
-                                      etaBinning = cms.vdouble(-2.4, 2.4)
+                                      etaBinning = cms.vdouble(-2.4, 2.4),
+                                      METCut = cms.double(40.),
+                                      leptonPtCut = cms.double(50.),
+                                      WPtCut = cms.double(200.),
+                                      MWWCut = cms.double(900.)
                                     )
 
 # PATH
@@ -109,5 +119,5 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.TFileService = cms.Service("TFileService",
-                                 fileName = cms.string("tree_mu.root")
+                                 fileName = cms.string("btag_tree_mu.root")
                                   )
