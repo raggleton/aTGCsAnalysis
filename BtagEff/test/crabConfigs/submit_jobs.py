@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     for c_dict, s_dict in product(channels, samples):
         output_filename = FEATURE_NAME + "/crab-%s-%s.py" % (s_dict['name'], c_dict['name'])
-        create_crab_config(request_name="%s_%s_%s" % (s_dict['name'], FEATURE_NAME, c_dict['name']),
+        create_crab_config(request_name="%s_%s_%s" % (s_dict['name'], c_dict['name'], FEATURE_NAME),
                            cmssw_config_file=c_dict['config'],
                            dataset=s_dict['dataset'],
                            units_per_job=s_dict.get("units_per_job", default_files_per_job),
