@@ -102,7 +102,6 @@ public:
 	      	else throw cms::Exception("InvalidValue") << "BTagUncertaintyType is not valid." << std::endl;
 	    }
 	    else throw cms::Exception("InvalidValue") << "Variation type is not valid." << std::endl;
-
 		return jet_scalefactor;
 	}
 	template<class T> double getEfficiency(T jet){
@@ -133,6 +132,8 @@ public:
 
 			}
 			double weight = probabData/probabMC;
+			// If NaN set as 0, since it will probably fail event cuts anyway
+			if (weight != weight) weight = 0;
 			return weight;
 		}
 	}
