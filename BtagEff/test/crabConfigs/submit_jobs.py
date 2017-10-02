@@ -9,7 +9,7 @@ import os
 from subprocess import check_call
 from itertools import product
 
-FEATURE_NAME = "btag_eff_withLeptonSF"
+FEATURE_NAME = "btag_eff_withLeptonSF_withCuts"
 
 # set True to actually submit jobs to crab
 SUBMIT_JOBS = True
@@ -98,14 +98,14 @@ if __name__ == "__main__":
 
     default_files_per_job = 2
 
-    for c_dict, s_dict in product(channels, samples):
-        output_filename = FEATURE_NAME + "/crab-%s-%s.py" % (s_dict['name'], c_dict['name'])
-        create_crab_config(request_name="%s_%s_%s" % (s_dict['name'], c_dict['name'], FEATURE_NAME),
-                           cmssw_config_file=c_dict['config'],
-                           dataset=s_dict['dataset'],
-                           units_per_job=s_dict.get("units_per_job", default_files_per_job),
+    for chan_dict, sample_dict in product(channels, samples):
+        output_filename = FEATURE_NAME + "/crab-%s-%s.py" % (sample_dict['name'], chan_dict['name'])
+        create_crab_config(request_name="%s_%s_%s" % (sample_dict['name'], chan_dict['name'], FEATURE_NAME),
+                           cmssw_config_file=chan_dict['config'],
+                           dataset=sample_dict['dataset'],
+                           units_per_job=sample_dict.get("units_per_job", default_files_per_job),
                            output_filename=output_filename)
         if SUBMIT_JOBS:
             submit_job(output_filename)
-            print "\033[0;40;32mtask:", s_dict['name'] + "-" + c_dict['name'], "was submitted!\033[0m"
+            print "\033[0;40;32mtask:", sample_dict['name'] + "-" + chan_dict['name'], "was submitted!\033[0m"
 
