@@ -102,6 +102,7 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     triggers = cms.InputTag("TriggerResults","","HLT"),
                                     isMC = cms.bool(False),
                                     BtagEffFile = cms.string(""),
+                                    BtagDiscrCut = cms.double(0.9535),
                                     isSignal = cms.bool(False),
                                     channel = cms.string("el")
                                     )

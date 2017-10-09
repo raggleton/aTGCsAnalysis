@@ -6,6 +6,7 @@ import sys
 import shutil
 import subprocess
 import collections
+import re
 
 
 # Cached num files per dataset, to avoid unnecessary das_client calls
@@ -72,41 +73,41 @@ def createConfigFile(processName, channel, isMC, isSignal, runBtoF=True):
 	ConfigFileName = config_outdir + "/analysis_" + channel + "_" + processName + "_MC.py"
 	VTagSF = 1.03
 	NoVTagSF = 1.0
-	btag_file = "eff_" + processName + "_" + channel + ".root"
+	btag_file = "eff_" + re.sub(r'-ext[12]?', '', processName) + "_" + channel + ".root"
 
 	if isSignal and isMC :
 		ConfigFileName = config_outdir + "/analysis_" + channel + "_signal.py"
-		copy_customise_analysis_config("../analysis_" + channel + "_signal.py", ConfigFileName)
+		copy_customise_analysis_config("../analysis_" + channel + "_signal.py", ConfigFileName, btag_eff_file=btag_file)
 
 	elif "WZ" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file="eff_WZ_" + channel + ".root", vtag_sf=VTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=VTagSF)
 
 	elif "WW" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=VTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=VTagSF)
 
 	elif "ttbar" in processName:
 		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file="eff_ttbar_"+channel+".root", vtag_sf=VTagSF)
 
 	elif "WJets" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=NoVTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=NoVTagSF)
 
 	elif "SingleTop-t-channel-top" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=NoVTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=NoVTagSF)
 
 	elif "SingleTop-t-channel-antitop" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=NoVTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=NoVTagSF)
 
 	elif "SingleTop-tW-channel-top" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=VTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=VTagSF)
 
 	elif "SingleTop-tW-channel-antitop" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=VTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=VTagSF)
 
 	elif "SingleTop-s-channel" in processName:
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, vtag_sf=NoVTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=NoVTagSF)
 
 	elif isMC :
-		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=None, vtag_sf=VTagSF)
+		copy_customise_analysis_config(TemplateFileName, ConfigFileName, btag_eff_file=btag_file, vtag_sf=VTagSF)
 
 	elif not isMC :
 		# DATA

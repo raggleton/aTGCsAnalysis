@@ -39,16 +39,18 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
   int Nevents_ = Nevents(FileName);
   TFile file(FileName.c_str(), "UPDATE");
   TTree * tree = (TTree*) file.Get("treeDumper/BasicTree");
-  double totWeight, topPtSF, totWeight_BTagUp, totWeight_BTagDown, totWeight_MistagUp, totWeight_MistagDown, triggerWeightHLTEle27NoER;
+  double totWeight, topPtSF, btagWeight, totWeight_BTagUp, totWeight_BTagDown, totWeight_MistagUp, totWeight_MistagDown, triggerWeightHLTEle27NoER;
   tree -> SetBranchAddress("totWeight", &totWeight);
   tree -> SetBranchAddress("topPtSF", &topPtSF);
+  tree -> SetBranchAddress("btagWeight", &btagWeight);
   tree -> SetBranchAddress("totWeight_BTagUp", &totWeight_BTagUp);
   tree -> SetBranchAddress("totWeight_BTagDown", &totWeight_BTagDown);
   tree -> SetBranchAddress("totWeight_MistagUp", &totWeight_MistagUp);
   tree -> SetBranchAddress("totWeight_MistagDown", &totWeight_MistagDown);
   if (channel == "ele") tree -> SetBranchAddress("triggerWeightHLTEle27NoER", &triggerWeightHLTEle27NoER);
-  double totWeightWithLumi, totWeightWithLumi_MistagUp, totWeightWithLumi_MistagDown, totWeightWithLumi_BTagUp, totWeightWithLumi_BTagDown;
+  double totWeightWithLumi, totWeightWithLumiNoBtag, totWeightWithLumi_MistagUp, totWeightWithLumi_MistagDown, totWeightWithLumi_BTagUp, totWeightWithLumi_BTagDown;
   TBranch * br = tree -> Branch("totEventWeight", &totWeightWithLumi, "totEventWeight/D"); 
+  TBranch * br_NoBtag = tree -> Branch("totEventWeightNoBtag", &totWeightWithLumiNoBtag, "totEventWeightNoBtag/D");
   TBranch * br_MistagUp = tree -> Branch("totEventWeight_MistagUp", &totWeightWithLumi_MistagUp, "totEventWeight_MistagUp/D"); 
   TBranch * br_MistagDown = tree -> Branch("totEventWeight_MistagDown", &totWeightWithLumi_MistagDown, "totEventWeight_MistagDown/D"); 
   TBranch * br_BTagUp = tree -> Branch("totEventWeight_BTagUp", &totWeightWithLumi_BTagUp, "totEventWeight_BTagUp/D"); 
@@ -78,12 +80,14 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
     // }
     // else { 
       totWeightWithLumi = totWeight*weightLumi;
+      totWeightWithLumiNoBtag = totWeightWithLumi/btagWeight;
       totWeightWithLumi_BTagUp = totWeight_BTagUp*weightLumi;
       totWeightWithLumi_BTagDown = totWeight_BTagDown*weightLumi;
       totWeightWithLumi_MistagUp= totWeight_MistagUp*weightLumi;
       totWeightWithLumi_MistagDown = totWeight_MistagDown*weightLumi;
     // }
     br -> Fill();
+    br_NoBtag -> Fill();
     br_MistagUp -> Fill();
     br_MistagDown -> Fill();
     br_BTagUp -> Fill();
