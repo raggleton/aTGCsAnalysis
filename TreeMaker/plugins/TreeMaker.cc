@@ -217,7 +217,7 @@ private:
   // For PUPPI Softdrop Mass Correction
   TF1 *puppisd_corrGEN, *puppisd_corrRECO_cen, *puppisd_corrRECO_for;
   JetCorrectionUncertainty * jecUnc;
-
+  double bTagDiscrCut;
 };
 
 //
@@ -252,7 +252,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     "aTGCsAnalysis/TreeMaker/data/egammaEffi.txt_EGM2D.root"
   ),
   JetResolutionSmearer_(iConfig.getParameter<bool>("isMC")),
-  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"))
+  BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"), iConfig.getParameter<double>("BtagDiscrCut")),
+  bTagDiscrCut(iConfig.getParameter<double>("BtagDiscrCut"))
 {
 
   if ((channel != "mu") && (channel != "el")) {
@@ -652,9 +653,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<edm::View<pat::Jet> > jets; 
    iEvent.getByToken(fatJetsToken_, jets);
    
-   //JAK4 ets (for Btag veto )
+   //AK4 Jets (for Btag veto )
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
    iEvent.getByToken(AK4JetsToken_, AK4Jets);
+   njets = AK4Jets->size();
    
    //MET
    edm::Handle<edm::View<pat::MET> > metHandle;
@@ -706,6 +708,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //btag weights
    if (njets > 0) {
      btagWeight =  BTagHelper_.getEventWeight(AK4Jets);
+     if (btagWeight != btagWeight) {
+      std::cout << "Event: " << nevent << " LS: " << lumi << std::endl;
+      throw std::runtime_error("Inf/NaN btagWeight for event ");
+     }
      btagWeight_BTagUp =  BTagHelper_.getEventWeight(AK4Jets, UP, BTAG);
      btagWeight_BTagDown =  BTagHelper_.getEventWeight(AK4Jets, DOWN, BTAG);
      btagWeight_MistagUp =  BTagHelper_.getEventWeight(AK4Jets, UP, MISTAG);
@@ -1260,7 +1266,6 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else throw cms::Exception("InvalidValue") << "This shouldn't happen, we require at least 1 jet, but the size of the jet collection for this event is zero!" << std::endl; 
   
   //Loop over the collection of the AK4 jets which contain b-tagging information (to veto b-jets)
-  njets = AK4Jets -> size(); 
   nbtag = 0;
   if(isMC){
     jetFlavours.clear();
@@ -1301,7 +1306,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (unsigned int iBtag = 0; iBtag < AK4Jets -> size(); iBtag ++)
   {
     //taken from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X#Supported_Algorithms_and_Operati
-    if(((AK4Jets -> at(iBtag)).bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > 0.935){
+    if(((AK4Jets -> at(iBtag)).bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
      nbtag ++;
     }
     if(isMC)jetFlavours.push_back((AK4Jets -> at(iBtag)).partonFlavour());
