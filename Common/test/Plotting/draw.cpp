@@ -127,7 +127,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 
 	var.VarName = "jet_mass_softdrop_PUPPI";
 	var.Title = "m_{jet softdrop PUPPI}";
-	var.SetRange(0., 250.);
+	var.SetRange(40., 150.);
 	variables.push_back(var);
 
 	var.VarName = "njets";

@@ -30,7 +30,8 @@ int Nevents(std::string filename){
   for (unsigned int iEntry = 0; iEntry < tree -> GetEntries(); iEntry ++)
   {
     tree -> GetEntry(iEntry); 
-    sum += gentWeight/std::abs(gentWeight);
+    //sum += gentWeight/std::abs(gentWeight);
+    sum += gentWeight;
   }
   return sum;
 }
