@@ -40,7 +40,7 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
   int Nevents_ = Nevents(FileName);
   TFile file(FileName.c_str(), "UPDATE");
   TTree * tree = (TTree*) file.Get("treeDumper/BasicTree");
-  double totWeight, topPtSF, btagWeight, totWeight_BTagUp, totWeight_BTagDown, totWeight_MistagUp, totWeight_MistagDown, triggerWeightHLTEle27NoER;
+  double totWeight, topPtSF, btagWeight, totWeight_BTagUp, totWeight_BTagDown, totWeight_MistagUp, totWeight_MistagDown, totWeight_LeptonIDUp, totWeight_LeptonIDDown, triggerWeightHLTEle27NoER;
   tree -> SetBranchAddress("totWeight", &totWeight);
   tree -> SetBranchAddress("topPtSF", &topPtSF);
   tree -> SetBranchAddress("btagWeight", &btagWeight);
@@ -48,14 +48,18 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
   tree -> SetBranchAddress("totWeight_BTagDown", &totWeight_BTagDown);
   tree -> SetBranchAddress("totWeight_MistagUp", &totWeight_MistagUp);
   tree -> SetBranchAddress("totWeight_MistagDown", &totWeight_MistagDown);
+  tree -> SetBranchAddress("totWeight_LeptonIDUp", &totWeight_LeptonIDUp);
+  tree -> SetBranchAddress("totWeight_LeptonIDDown", &totWeight_LeptonIDDown);
   if (channel == "ele") tree -> SetBranchAddress("triggerWeightHLTEle27NoER", &triggerWeightHLTEle27NoER);
-  double totWeightWithLumi, totWeightWithLumiNoBtag, totWeightWithLumi_MistagUp, totWeightWithLumi_MistagDown, totWeightWithLumi_BTagUp, totWeightWithLumi_BTagDown;
+  double totWeightWithLumi, totWeightWithLumiNoBtag, totWeightWithLumi_MistagUp, totWeightWithLumi_MistagDown, totWeightWithLumi_BTagUp, totWeightWithLumi_BTagDown, totWeightWithLumi_LeptonIDUp, totWeightWithLumi_LeptonIDDown;
   TBranch * br = tree -> Branch("totEventWeight", &totWeightWithLumi, "totEventWeight/D"); 
   TBranch * br_NoBtag = tree -> Branch("totEventWeightNoBtag", &totWeightWithLumiNoBtag, "totEventWeightNoBtag/D");
   TBranch * br_MistagUp = tree -> Branch("totEventWeight_MistagUp", &totWeightWithLumi_MistagUp, "totEventWeight_MistagUp/D"); 
   TBranch * br_MistagDown = tree -> Branch("totEventWeight_MistagDown", &totWeightWithLumi_MistagDown, "totEventWeight_MistagDown/D"); 
   TBranch * br_BTagUp = tree -> Branch("totEventWeight_BTagUp", &totWeightWithLumi_BTagUp, "totEventWeight_BTagUp/D"); 
   TBranch * br_BTagDown = tree -> Branch("totEventWeight_BTagDown", &totWeightWithLumi_BTagDown, "totEventWeight_BTagDown/D");
+  TBranch * br_LeptonIDUp = tree -> Branch("totEventWeight_LeptonIDUp", &totWeightWithLumi_LeptonIDUp, "totEventWeight_LeptonIDUp/D");
+  TBranch * br_LeptonIDDown = tree -> Branch("totEventWeight_LeptonIDDown", &totWeightWithLumi_LeptonIDDown, "totEventWeight_LeptonIDDown/D");
   std::cout << FileName << std::endl;
   std::cout << "Number of events (effective):" << Nevents_ << std::endl;
 
@@ -86,6 +90,8 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
       totWeightWithLumi_BTagDown = totWeight_BTagDown*weightLumi;
       totWeightWithLumi_MistagUp= totWeight_MistagUp*weightLumi;
       totWeightWithLumi_MistagDown = totWeight_MistagDown*weightLumi;
+      totWeightWithLumi_LeptonIDUp= totWeight_LeptonIDUp*weightLumi;
+      totWeightWithLumi_LeptonIDDown = totWeight_LeptonIDDown*weightLumi;
     // }
     br -> Fill();
     br_NoBtag -> Fill();
@@ -93,6 +99,8 @@ void addWeight(string FileName, float xsection, float lumi, std::string channel)
     br_MistagDown -> Fill();
     br_BTagUp -> Fill();
     br_BTagDown -> Fill();
+    br_LeptonIDUp -> Fill();
+    br_LeptonIDDown -> Fill();
   }
   
   tree -> Write();
