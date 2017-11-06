@@ -143,9 +143,9 @@ private:
   bool isMatched_;
   //JEC uncertainties
   double JECunc;
-  double jet_pt_JECUp, jet_pt_JECDown, jet_mass_JECUp, jet_mass_JECDown, jet_mass_pruned_JECUp, jet_mass_pruned_JECDown, jet_mass_softdrop_JECUp, jet_mass_softdrop_JECDown;
+  double jet_pt_JECUp, jet_pt_JECDown, jet_mass_JECUp, jet_mass_JECDown, jet_mass_pruned_JECUp, jet_mass_pruned_JECDown, jet_mass_softdrop_JECUp, jet_mass_softdrop_JECDown, jet_mass_softdrop_PUPPI_JECUp, jet_mass_softdrop_PUPPI_JECDown;
   //JER uncerainties
-  double jet_pt_JERUp, jet_pt_JERDown, jet_mass_JERUp, jet_mass_JERDown, jet_mass_softdrop_JERUp, jet_mass_softdrop_JERDown, jet_mass_pruned_JERUp, jet_mass_pruned_JERDown;
+  double jet_pt_JERUp, jet_pt_JERDown, jet_mass_JERUp, jet_mass_JERDown, jet_mass_softdrop_JERUp, jet_mass_softdrop_JERDown, jet_mass_pruned_JERUp, jet_mass_pruned_JERDown, jet_mass_softdrop_PUPPI_JERUp, jet_mass_softdrop_PUPPI_JERDown;
   //AK4 jets
   double jet2_pt, jet2_btag, jet3_pt, jet3_btag;
   double jet2_eta,jet2_phi, jet3_eta, jet3_phi;
@@ -558,11 +558,15 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     outTree_->Branch("Mjpruned_JECDown",    &jet_mass_pruned_JECDown,    "Mjpruned_JECDown/D"   );  
     outTree_->Branch("jet_mass_softdrop_JECUp",    &jet_mass_softdrop_JECUp,    "jet_mass_softdrop_JECUp/D"   ); 
     outTree_->Branch("jet_mass_softdrop_JECDown",    &jet_mass_softdrop_JECDown,    "jet_mass_softdrop_JECDown/D"   );  
+    outTree_->Branch("jet_mass_softdrop_PUPPI_JECUp",    &jet_mass_softdrop_PUPPI_JECUp,    "jet_mass_softdrop_PUPPI_JECUp/D"   );
+    outTree_->Branch("jet_mass_softdrop_PUPPI_JECDown",    &jet_mass_softdrop_PUPPI_JECDown,    "jet_mass_softdrop_PUPPI_JECDown/D"   );
     //JER uncertainties
     outTree_->Branch("Mjpruned_JERUp",    &jet_mass_pruned_JERUp,    "Mjpruned_JERUp/D"   ); 
     outTree_->Branch("Mjpruned_JERDown",    &jet_mass_pruned_JERDown,    "Mjpruned_JERDown/D"   );  
     outTree_->Branch("jet_mass_softdrop_JERUp",    &jet_mass_softdrop_JERUp,    "jet_mass_softdrop_JERUp/D"   ); 
     outTree_->Branch("jet_mass_softdrop_JERDown",    &jet_mass_softdrop_JERDown,    "jet_mass_softdrop_JERDown/D"   );  
+    outTree_->Branch("jet_mass_softdrop_PUPPI_JERUp",    &jet_mass_softdrop_PUPPI_JERUp,    "jet_mass_softdrop_PUPPI_JERUp/D"   );
+    outTree_->Branch("jet_mass_softdrop_PUPPI_JERDown",    &jet_mass_softdrop_PUPPI_JERDown,    "jet_mass_softdrop_PUPPI_JERDown/D"   );
     outTree_->Branch("isMatched",    &isMatched_,    "isMatched/B"   ); 
     //add info for AK4 jets
     outTree_ -> Branch("jetFlavours",  &jetFlavours); 
@@ -1244,6 +1248,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       jet_mass_pruned_JECUp = (1 + JECunc)*jet_mass_pruned;
       jet_mass_softdrop_JECDown = (1 - JECunc)*jet_mass_softdrop;
       jet_mass_softdrop_JECUp = (1 + JECunc)*jet_mass_softdrop;
+      jet_mass_softdrop_PUPPI_JECDown = (1 - JECunc)*jet_mass_softdrop_PUPPI;
+      jet_mass_softdrop_PUPPI_JECUp = (1 + JECunc)*jet_mass_softdrop_PUPPI;
 
       //JER uncertainty
       smearedJetUp = JetResolutionSmearer_.LorentzVectorWithSmearedPt(fatJet,Variation::UP);
@@ -1260,6 +1266,9 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       
       jet_mass_softdrop_JERUp = JERUpCorrection*jet_mass_softdrop;
       jet_mass_softdrop_JERDown = JERDownCorrection*jet_mass_softdrop;
+
+      jet_mass_softdrop_PUPPI_JERUp = JERUpCorrection*jet_mass_softdrop_PUPPI;
+      jet_mass_softdrop_PUPPI_JERDown = JERDownCorrection*jet_mass_softdrop_PUPPI;
     }
   }
   

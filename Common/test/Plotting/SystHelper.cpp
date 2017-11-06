@@ -35,6 +35,8 @@ SystHelper::SystHelper(std::string selection){
   VarsJEC.push_back("deltaPhi_LeptonMet");
   VarsJEC.push_back("deltaPhi_WJetMet");
   VarsJEC.push_back("deltaPhi_WJetWlep");
+  //VarsJEC.push_back("jet_mass_softdrop_PUPPI");
+
   //En (lepton energy scale)
   VarsLeptonEn.push_back("l_pt");
   VarsLeptonEn.push_back("W_pt");
@@ -46,6 +48,7 @@ SystHelper::SystHelper(std::string selection){
   VarsLeptonEn.push_back("deltaPhi_WJetMet");
   VarsLeptonEn.push_back("deltaPhi_WJetWlep");
   VarsLeptonEn.push_back("m_lvj");
+
   //lepton resolution
   VarsLeptonRes.push_back("l_pt");
   VarsLeptonRes.push_back("W_pt");
@@ -73,6 +76,7 @@ SystHelper::SystHelper(std::string selection){
   VarsJER.push_back("jet_mass");
   VarsJER.push_back("Mjpruned");
   VarsJER.push_back("jet_mass_softdrop");
+  //VarsJER.push_back("jet_mass_softdrop_PUPPI");
 
   //JetRes, please merge JER and JetRes!
   VarsJetRes.push_back("MWW");
