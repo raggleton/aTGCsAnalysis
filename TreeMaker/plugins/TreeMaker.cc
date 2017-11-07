@@ -173,7 +173,7 @@ private:
   //m_lvj
   double m_lvj;
   //m_lvj systematics
-  double m_lvj_UnclEnUp, m_lvj_UnclEnDown, m_lvj_JECUp, m_lvj_JECDown, m_lvj_LeptonEnUp, m_lvj_LeptonEnDown, m_lvj_LeptonResUp, m_lvj_LeptonResDown, m_lvj_JetResUp, m_lvj_JetResDown;
+  double m_lvj_UnclEnUp, m_lvj_UnclEnDown, m_lvj_JECUp, m_lvj_JECDown, m_lvj_LeptonEnUp, m_lvj_LeptonEnDown, m_lvj_LeptonResUp, m_lvj_LeptonResDown, m_lvj_JERUp, m_lvj_JERDown;
 
   double refXsec;
   //aTGC weights
@@ -601,8 +601,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     outTree_->Branch("MWW_LeptonEnDown",       &m_lvj_LeptonEnDown,         "MWW_LeptonEnDown/D"   );      
     outTree_->Branch("MWW_LeptonResUp",       &m_lvj_LeptonResUp,         "MWW_LeptonResUp/D"   );
     outTree_->Branch("MWW_LeptonResDown",       &m_lvj_LeptonResDown,         "MWW_LeptonResDown/D"   );   
-    outTree_->Branch("MWW_JetResUp",       &m_lvj_JetResUp,         "MWW_JetResUp/D"   );
-    outTree_->Branch("MWW_JetResDown",       &m_lvj_JetResDown,         "MWW_JetResDown/D"   );       
+    outTree_->Branch("MWW_JERUp",       &m_lvj_JERUp,         "MWW_JERUp/D"   );
+    outTree_->Branch("MWW_JERDown",       &m_lvj_JERDown,         "MWW_JERDown/D"   );       
   }
 
  if (isSignal) {
@@ -1432,13 +1432,13 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
     lvj_p4_Up = smearedJetUp + SystMap.at("JetResUp");
     lvj_p4_Down = smearedJetDown + SystMap.at("JetResDown");
-    m_lvj_JetResUp = lvj_p4_Up.M();
-    m_lvj_JetResDown = lvj_p4_Down.M();
+    m_lvj_JERUp = lvj_p4_Up.M();
+    m_lvj_JERDown = lvj_p4_Down.M();
 
    }
    else {
-    m_lvj_JetResUp = -99.;
-    m_lvj_JetResDown = -99.;
+    m_lvj_JERUp = -99.;
+    m_lvj_JERDown = -99.;
    }
 
    edm::Handle<edm::TriggerResults> Triggers;

@@ -35,7 +35,7 @@ SystHelper::SystHelper(std::string selection){
   VarsJEC.push_back("deltaPhi_LeptonMet");
   VarsJEC.push_back("deltaPhi_WJetMet");
   VarsJEC.push_back("deltaPhi_WJetWlep");
-  //VarsJEC.push_back("jet_mass_softdrop_PUPPI");
+  VarsJEC.push_back("jet_mass_softdrop_PUPPI");
 
   //En (lepton energy scale)
   VarsLeptonEn.push_back("l_pt");
@@ -47,14 +47,14 @@ SystHelper::SystHelper(std::string selection){
   VarsLeptonEn.push_back("deltaPhi_LeptonMet");
   VarsLeptonEn.push_back("deltaPhi_WJetMet");
   VarsLeptonEn.push_back("deltaPhi_WJetWlep");
-  VarsLeptonEn.push_back("m_lvj");
+  VarsLeptonEn.push_back("MWW");
 
   //lepton resolution
   VarsLeptonRes.push_back("l_pt");
   VarsLeptonRes.push_back("W_pt");
   VarsLeptonRes.push_back("W_mass");
   VarsLeptonRes.push_back("W_mt");
-  VarsLeptonRes.push_back("m_lvj");
+  VarsLeptonRes.push_back("MWW");
 
   //MET
   VarsUnclEn.push_back("W_pt");
@@ -76,17 +76,18 @@ SystHelper::SystHelper(std::string selection){
   VarsJER.push_back("jet_mass");
   VarsJER.push_back("Mjpruned");
   VarsJER.push_back("jet_mass_softdrop");
-  //VarsJER.push_back("jet_mass_softdrop_PUPPI");
+  VarsJER.push_back("MWW");
+  VarsJER.push_back("jet_mass_softdrop_PUPPI");
 
   //JetRes, please merge JER and JetRes!
-  VarsJetRes.push_back("MWW");
+  //VarsJetRes.push_back("MWW");
 
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("JEC", VarsJEC));
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("LeptonEn", VarsLeptonEn));
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("LeptonRes", VarsLeptonRes));
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("UnclEn", VarsUnclEn));
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("JER", VarsJER));
-  VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("JetRes", VarsJetRes));
+  //VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("JetRes", VarsJetRes));
 
   //weighted systematics
   WeightNameSystematics.push_back("Mistag");
