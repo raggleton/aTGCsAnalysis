@@ -16,7 +16,7 @@ import pandas
 #from ROOT import RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf, RooAnaExpNPdf, RooExpNPdf, RooAlpha4ExpNPdf, RooExpTailPdf, RooAlpha4ExpTailPdf, Roo2ExpPdf, RooAlpha42ExpPdf
 
 POI	=	['cwww','ccw','cb']
-par_max = {'cwww' : 12, 'ccw' : 20, 'cb' : 60}#atgc points
+par_max = {'cwww' : 3.6, 'ccw' : 4.5, 'cb' : 20}#atgc points
 
 gStyle.SetOptStat(0)
 gStyle.SetOptTitle(0)
@@ -61,9 +61,9 @@ def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,bi
 	#prepare variables, parameters and temporary workspace
 	wtmp		= RooWorkspace('wtmp')
 	a1		= RooRealVar('a_SM_%s_%s'%(cat,ch),'a_SM_%s_%s'%(cat,ch),-0.1,-2,0)
-	cwww		= RooRealVar('cwww','cwww',0,-120,120);
-	ccw		= RooRealVar('ccw','ccw',0,-200,200);
-	cb		= RooRealVar('cb','cb',0,-600,600);
+	cwww		= RooRealVar('cwww','cwww',0,-36,36);
+	ccw		= RooRealVar('ccw','ccw',0,-45,45);
+	cb		= RooRealVar('cb','cb',0,-200,200);
 	cwww.setConstant(kTRUE);
 	ccw.setConstant(kTRUE);
 	cb.setConstant(kTRUE);
@@ -140,10 +140,10 @@ def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,bi
 	paralist.add(RooArgList(wtmp.function('N_quad_%s_%s_%s'%(POI[0],cat,ch)),wtmp.var('cwww'),\
 				wtmp.function('N_quad_%s_%s_%s'%(POI[1],cat,ch)),wtmp.var('ccw'),\
 				wtmp.function('N_quad_%s_%s_%s'%(POI[2],cat,ch)),wtmp.var('cb')))
-	N1		= RooFormulaVar( 'N1_%s_%s'%(cat,ch),'N1_%s_%s'%(cat,ch),'@0/(@0+@1*(@2/12)**2+@3*(@4/20)**2+@5*(@6/60)**2)',paralist)
-	N2		= RooFormulaVar( 'N2_%s_%s'%(cat,ch),'N2_%s_%s'%(cat,ch),'@1*(@2/12)**2/(@0+@1*(@2/12)**2+@3*(@4/20)**2+@5*(@6/60)**2)',paralist)
-	N3		= RooFormulaVar( 'N3_%s_%s'%(cat,ch),'N3_%s_%s'%(cat,ch),'@3*(@4/20)**2/(@0+@1*(@2/12)**2+@3*(@4/20)**2+@5*(@6/60)**2)',paralist)
-	N4		= RooFormulaVar( 'N4_%s_%s'%(cat,ch),'N4_%s_%s'%(cat,ch),'@5*(@6/60)**2/(@0+@1*(@2/12)**2+@3*(@4/20)**2+@5*(@6/60)**2)',paralist)
+	N1		= RooFormulaVar( 'N1_%s_%s'%(cat,ch),'N1_%s_%s'%(cat,ch),'@0/(@0+@1*(@2/3.6)**2+@3*(@4/4.5)**2+@5*(@6/20)**2)',paralist)
+	N2		= RooFormulaVar( 'N2_%s_%s'%(cat,ch),'N2_%s_%s'%(cat,ch),'@1*(@2/3.6)**2/(@0+@1*(@2/3.6)**2+@3*(@4/4.5)**2+@5*(@6/20)**2)',paralist)
+	N3		= RooFormulaVar( 'N3_%s_%s'%(cat,ch),'N3_%s_%s'%(cat,ch),'@3*(@4/4.5)**2/(@0+@1*(@2/3.6)**2+@3*(@4/4.5)**2+@5*(@6/20)**2)',paralist)
+	N4		= RooFormulaVar( 'N4_%s_%s'%(cat,ch),'N4_%s_%s'%(cat,ch),'@5*(@6/20)**2/(@0+@1*(@2/3.6)**2+@3*(@4/4.5)**2+@5*(@6/20)**2)',paralist)
 	N_list		= RooArgList(N1,N2,N3,N4)
 	Pdf_list	= RooArgList(SMPdf,wtmp.pdf('Pdf_quad_%s_%s_%s'%(POI[0],cat,ch)),wtmp.pdf('Pdf_quad_%s_%s_%s'%(POI[1],cat,ch)),wtmp.pdf('Pdf_quad_%s_%s_%s'%(POI[2],cat,ch)))
 
