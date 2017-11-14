@@ -21,12 +21,12 @@
  * root -l addWeightSamples.cpp+
  */
 
-int Nevents(std::string filename){
+double Nevents(std::string filename){
    TFile file(filename.c_str(), "READ");
   TTree * tree = (TTree*) file.Get("GenWeights/Tree");
   double gentWeight;
   tree -> SetBranchAddress("genWeight", &gentWeight);
-  int sum = 0;
+  double sum = 0;
   for (unsigned int iEntry = 0; iEntry < tree -> GetEntries(); iEntry ++)
   {
     tree -> GetEntry(iEntry); 
@@ -37,7 +37,7 @@ int Nevents(std::string filename){
 }
 void addWeight(string FileName, float xsection, float lumi, std::string channel)
 {
-  int Nevents_ = Nevents(FileName);
+  double Nevents_ = Nevents(FileName);
   TFile file(FileName.c_str(), "UPDATE");
   TTree * tree = (TTree*) file.Get("treeDumper/BasicTree");
   double totWeight, topPtSF, btagWeight, totWeight_BTagUp, totWeight_BTagDown, totWeight_MistagUp, totWeight_MistagDown, totWeight_LeptonIDUp, totWeight_LeptonIDDown, triggerWeightHLTEle27NoER;

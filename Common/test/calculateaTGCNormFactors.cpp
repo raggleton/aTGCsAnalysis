@@ -27,13 +27,13 @@ using namespace std;
   return ss.str();
 }*/
 
-int nEffEvents(string filename)
+double nEffEvents(string filename)
 {
 	TFile file(filename.c_str(), "READ");
 	TTree* tree = (TTree*) file.Get("GenWeights/Tree");
 	double gentWeight;
 	tree->SetBranchAddress("genWeight", &gentWeight);
-	int sum = 0;
+	double sum = 0;
 	for (unsigned int iEntry=0; iEntry<tree->GetEntries(); iEntry++)
 	{
 		tree->GetEntry(iEntry); 
@@ -75,7 +75,7 @@ void calculateFactor(string fileNameSM, double xSecSM,  string fileName600To800,
 		else if(MWW>800 && jetPt>180) yieldSM800ToInf += (lumiWeightSM*otherTotWeight);
 	}
 
-	// aTGC tree having MWW from 600 to 800 Gev
+	// aTGC tree having MWW from 600 to 800 GeV
 	lumiWeight600To800=(xSec600To800*lumi)/nEffEvents(fileName600To800);
         tree600To800->SetBranchAddress("MWW", &MWW);
         tree600To800->SetBranchAddress("jet_pt", &jetPt);
@@ -87,7 +87,7 @@ void calculateFactor(string fileNameSM, double xSecSM,  string fileName600To800,
                 yield600To800 += (lumiWeight600To800*otherTotWeight*aTGCReweights->at(61));
         }
 
-	// aTGC tree having MWW from 800 to Inf Gev
+	// aTGC tree having MWW from 800 to Inf GeV
 	lumiWeight800ToInf=(xSec800ToInf*lumi)/nEffEvents(fileName800ToInf);
         tree800ToInf->SetBranchAddress("MWW", &MWW);
         tree800ToInf->SetBranchAddress("jet_pt", &jetPt);
