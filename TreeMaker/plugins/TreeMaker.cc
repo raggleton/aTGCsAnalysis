@@ -1478,7 +1478,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //	std::cout<<topSF<<" "<<antitopSF<<" "<<topPtSF<<std::endl;
   }
 
-  int genWeightPosForaTGC=std::abs(genWeight);
+  double genWeightPosForaTGC=std::abs(genWeight);
   if(isMC && !isSignal) genWeightPosForaTGC=genWeight;
 
   if (isMC) {
