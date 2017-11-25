@@ -54,8 +54,14 @@ void Plotter::Plotting(std::string OutPrefix_)
   std::string channelName;
   if (channel == MUON) channelName = "mu";
   else channelName = "ele";
-  if (wantToWriteHists) fileToWriteHists = new TFile(("hists_" + channelName + ".root").c_str(), "RECREATE");
-  if (withSignal) fileToWriteHistsSignal = new TFile(("hists_signal_" + channelName + ".root").c_str(), "RECREATE");
+
+  if (wantToWriteHists && cat=="WW") fileToWriteHists = new TFile(("hists_WW_" + channelName + ".root").c_str(), "RECREATE");
+  else if (wantToWriteHists && cat=="WZ") fileToWriteHists = new TFile(("hists_WZ_" + channelName + ".root").c_str(), "RECREATE");
+  else if (wantToWriteHists) fileToWriteHists = new TFile(("hists_" + channelName + ".root").c_str(), "RECREATE");
+
+  if (withSignal && cat=="WW") fileToWriteHistsSignal = new TFile(("hists_signal_WW_" + channelName + ".root").c_str(), "RECREATE");
+  else if (withSignal && cat=="WZ") fileToWriteHistsSignal = new TFile(("hists_signal_WZ_" + channelName + ".root").c_str(), "RECREATE");
+  else if (withSignal) fileToWriteHistsSignal = new TFile(("hists_signal_" + channelName + ".root").c_str(), "RECREATE");
 
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);

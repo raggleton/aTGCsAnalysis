@@ -63,6 +63,7 @@ class Plotter
 	bool withSignal = true;
 	bool withMC = true;
 	bool wantToWriteHists = false;
+	std::string cat="default";
 	
 	Plotter();
 	Plotter(CHANNEL channel_);

@@ -198,7 +198,6 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	p.setLumi(35922., 1.);
 
 	
-	// string defaulCuts = "(jet_pt > 200. && jet_tau21_PUPPI < 0.6  && Mjpruned < 150. && Mjpruned > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900.";
 	string defaulCuts = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 150. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900.";
 	if (channel == "ele") defaulCuts += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") defaulCuts += " && l_pt > 50. && pfMET > 40. )"; 
@@ -206,13 +205,10 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		std::cerr << "Invalid channel used, use ele or mu" << std::endl;
 		exit(0);
 	}
-	// string addOnCutWjets = defaulCuts +  " * ( (Mjpruned < 65. || Mjpruned > 105. ) && nbtag == 0) ";
-	// string addOnCutTtbar = defaulCuts +  " * (nbtag > 0 )";
 	string addOnCutWjets = defaulCuts +  " * ( (jet_mass_softdrop_PUPPI  < 65. || jet_mass_softdrop_PUPPI > 105. ) && nbtag == 0) ";
         string addOnCutTtbar = defaulCuts +  " * (nbtag > 0 )";
 
-	// string signalRegion  ="(jet_pt > 200. && jet_tau21_PUPPI < 0.6  && Mjpruned < 105. && Mjpruned > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
-	string signalRegion  ="(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	string signalRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
 	if (channel == "ele") signalRegion += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") signalRegion += " && l_pt > 50. && pfMET > 40. )"; 
 	else {
@@ -220,7 +216,22 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		exit(0);
 	}
 
-	// string TTBarEnrichedInclusive = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.6  && Mjpruned < 200. && Mjpruned > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. ";
+	string signalWWRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 85. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	if (channel == "ele") signalWWRegion += " && l_pt > 50. && pfMET > 80. )";
+        else if (channel == "mu") signalWWRegion += " && l_pt > 50. && pfMET > 40. )";
+        else {
+                std::cerr << "Invalid channel used, use ele or mu" << std::endl;
+                exit(0);
+        }
+
+	string signalWZRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 85. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	if (channel == "ele") signalWZRegion += " && l_pt > 50. && pfMET > 80. )";
+        else if (channel == "mu") signalWZRegion += " && l_pt > 50. && pfMET > 40. )";
+        else {
+                std::cerr << "Invalid channel used, use ele or mu" << std::endl;
+                exit(0);
+        }
+
 	string TTBarEnrichedInclusive = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. ";
 	if (channel == "ele") TTBarEnrichedInclusive += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") TTBarEnrichedInclusive += " && l_pt > 50. && pfMET > 40. )"; 
@@ -229,7 +240,6 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		exit(0);
 	}
 
-	// string TTBarEnrichedBTagVeto = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.6  && Mjpruned < 200. && Mjpruned > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0 ";
 	string TTBarEnrichedBTagVeto = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0 ";
 	if (channel == "ele") TTBarEnrichedBTagVeto += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") TTBarEnrichedBTagVeto += " && l_pt > 50. && pfMET > 40. )"; 
@@ -265,6 +275,16 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		SignalSelection = "( " + signalRegion + " )";
 		DataSelection = signalRegion;
 	}
+	else if(region == "signalWW"){
+                MCSelection =  signalWWRegion;
+                SignalSelection = "( " + signalWWRegion + " )";
+                DataSelection = signalWWRegion;
+        }
+	else if(region == "signalWZ"){
+                MCSelection =  signalWZRegion;
+                SignalSelection = "( " + signalWZRegion + " )";
+                DataSelection = signalWZRegion;
+        }
 	else std::cout << "This should not happen ..." << std::endl;
 
 		
@@ -335,6 +355,8 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	p.withData = withData_;
 	p.withMC = withMC_;
 	p.wantToWriteHists = wantToWriteHists_;
+	if(region=="signalWW") p.cat="WW";
+	else if(region=="signalWZ") p.cat="WZ";
  	p.Plotting(("plots_25ns_" + channel + "_" + tag + "/").c_str());
 
 }
@@ -381,7 +403,7 @@ int main(int argc, char* argv[]){
     if(vm.count("CR")) {
 	  if (vm["CR"].as<std::string>() != "ttbar" && vm["CR"].as<std::string>() != "WJets" && \
 	  	vm["CR"].as<std::string>() != "TTBarEnrichedInclusive" && vm["CR"].as<std::string>() != "TTBarEnrichedBTagVeto" &&  \
-	  	vm["CR"].as<std::string>() != "signal" ) {
+	  	vm["CR"].as<std::string>() != "signal" && vm["CR"].as<std::string>() != "signalWW" && vm["CR"].as<std::string>() != "signalWZ") {
 	  	std::cerr << "Not supported region" << std::endl;
 	  	exit(0);
 	  }	   
