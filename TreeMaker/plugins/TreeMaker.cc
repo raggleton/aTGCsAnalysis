@@ -135,6 +135,9 @@ private:
   
   //Jets
   int NAK8jet, njets, nbtag;
+  int NAK8jet_smearedUp, njets_smearedUp, nbtag_smearedUp;
+  int NAK8jet_smearedDown, njets_smearedDown, nbtag_smearedDown;
+
   double jet_pt, jet_eta, jet_phi, jet_mass, jet_mass_pruned, jet_mass_softdrop, jet_tau2tau1, jet_tau3tau2, jet_tau1, jet_tau2, jet_tau3;
   //PUPPI variables 
   double jet_pt_PUPPI, jet_eta_PUPPI, jet_phi_PUPPI, jet_mass_PUPPI, jet_tau1_PUPPI, jet_tau2_PUPPI, jet_tau3_PUPPI, jet_tau21_PUPPI, jet_tau32_PUPPI, jet_mass_softdrop_PUPPI, jet_tau21_DT;
@@ -194,7 +197,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::Candidate>> leptonicVToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> genParticlesToken_;
   edm::EDGetTokenT<edm::View<pat::Jet>> fatJetsToken_;
-  edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_;
+  edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_, AK4JetsSmearedUpToken_, AK4JetsSmearedDownToken_;
   edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseMuToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseEleToken_;
@@ -229,6 +232,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   genParticlesToken_(mayConsume<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("genSrc"))),
   fatJetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("fatJetSrc"))),
   AK4JetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("AK4JetSrc"))),
+  AK4JetsSmearedUpToken_(consumes<edm::View<pat::Jet>>(edm::InputTag("goodAK4JetsSmearedUp"))),
+  AK4JetsSmearedDownToken_(consumes<edm::View<pat::Jet>>(edm::InputTag("goodAK4JetsSmearedDown"))),
   vertexToken_(consumes<edm::View<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
   looseMuToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseMuSrc"))),
   looseEleToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseEleSrc"))),
@@ -583,8 +588,16 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     outTree_ -> Branch("BgenjetStatus43_mass",  &BgenjetStatus43_mass); 
     outTree_ -> Branch("BgenjetStatus43_motherPDGID",  &BgenjetStatus43_motherPDGID); 
   }
-  outTree_->Branch("njets",  	      &njets,	          "njets/I"   );
-  outTree_->Branch("nbtag",  	      &nbtag,	          "nbtag/I"   );
+  outTree_->Branch("njets",         &njets,           "njets/I"   );
+  outTree_->Branch("nbtag",         &nbtag,           "nbtag/I"   );
+
+  if (isMC) {
+    outTree_->Branch("njets_JERUp",         &njets_smearedUp,           "njets_JERUp/I"   );
+    outTree_->Branch("nbtag_JERUp",         &nbtag_smearedUp,           "nbtag_JERUp/I"   );
+
+    outTree_->Branch("njets_JERDown",         &njets_smearedDown,           "njets_JERDown/I"   );
+    outTree_->Branch("nbtag_JERDown",         &nbtag_smearedDown,           "nbtag_JERDown/I"   );
+  }
   
   outTree_->Branch("jet2_pt",  	      &jet2_pt,	          "jet2_pt/D"   );
   outTree_->Branch("jet2_btag",       &jet2_btag,         "jet2_btag/D"   );
@@ -661,6 +674,14 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
    iEvent.getByToken(AK4JetsToken_, AK4Jets);
    njets = AK4Jets->size();
+
+   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedUp;
+   iEvent.getByToken(AK4JetsSmearedUpToken_, AK4JetsSmearedUp);
+   njets_smearedUp = AK4JetsSmearedUp->size();
+
+   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedDown;
+   iEvent.getByToken(AK4JetsSmearedDownToken_, AK4JetsSmearedDown);
+   njets_smearedDown = AK4JetsSmearedDown->size();
    
    //MET
    edm::Handle<edm::View<pat::MET> > metHandle;
@@ -1275,7 +1296,6 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else throw cms::Exception("InvalidValue") << "This shouldn't happen, we require at least 1 jet, but the size of the jet collection for this event is zero!" << std::endl; 
   
   //Loop over the collection of the AK4 jets which contain b-tagging information (to veto b-jets)
-  nbtag = 0;
   if(isMC){
     jetFlavours.clear();
 
@@ -1311,15 +1331,35 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
      }
     }
-  }  
-  for (unsigned int iBtag = 0; iBtag < AK4Jets -> size(); iBtag ++)
+  }
+  // Count number of btagged AK4 jets
+  nbtag = 0;
+  nbtag_smearedUp = 0;
+  nbtag_smearedDown = 0;
+  for (const auto & itr : *AK4Jets)
   {
     //taken from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X#Supported_Algorithms_and_Operati
-    if(((AK4Jets -> at(iBtag)).bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
-     nbtag ++;
+    if((itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
+      nbtag ++;
     }
-    if(isMC)jetFlavours.push_back((AK4Jets -> at(iBtag)).partonFlavour());
+    // std::cout << "Nominal " << itr.pt() << " : " << itr.eta() << std::endl;
+    if(isMC) jetFlavours.push_back(itr.partonFlavour());
+  }
 
+  if (isMC) {
+    for (const auto & itr : *AK4JetsSmearedUp) {
+      if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
+        nbtag_smearedUp++;
+      }
+      // std::cout << "Up " << itr.pt() << " : " << itr.eta() << std::endl;
+    }
+
+    for (const auto & itr : *AK4JetsSmearedDown) {
+      if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
+        nbtag_smearedDown++;
+      }
+      // std::cout << "Down " << itr.pt() << " : " << itr.eta() << std::endl;
+    }
   }
  
   if (AK4Jets -> size() > 0)
