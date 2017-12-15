@@ -232,8 +232,6 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   genParticlesToken_(mayConsume<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("genSrc"))),
   fatJetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("fatJetSrc"))),
   AK4JetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("AK4JetSrc"))),
-  AK4JetsSmearedUpToken_(consumes<edm::View<pat::Jet>>(edm::InputTag("goodAK4JetsSmearedUp"))),
-  AK4JetsSmearedDownToken_(consumes<edm::View<pat::Jet>>(edm::InputTag("goodAK4JetsSmearedDown"))),
   vertexToken_(consumes<edm::View<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
   looseMuToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseMuSrc"))),
   looseEleToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseEleSrc"))),
@@ -275,6 +273,10 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   //loading PU and generator information for MC
    if (isMC) {
      SystematicsHelper_  = SystematicsHelper(channel, consumesCollector());
+
+    // Use the AK4 jet label as basis
+    AK4JetsSmearedUpToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "SmearedUp"));
+    AK4JetsSmearedDownToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "SmearedDown"));
 
      PUInfoToken_ = consumes<std::vector< PileupSummaryInfo > >(iConfig.getParameter<edm::InputTag>("PUInfo"));
 
