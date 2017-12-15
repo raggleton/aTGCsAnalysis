@@ -80,8 +80,24 @@ bestJet =cms.EDFilter("LargestPtCandViewSelector",
   )
 
 
-
 fatJetsSequence = cms.Sequence(patAK8JetCorrFactorsReapplyJEC + slimmedJetsAK8NewJEC + slimmedJetsAK8Smeared + selectedPatJetsAK8ByPt + selectedPatJetsAK8 + cleanJets + goodJets + bestJet)
+
+# Add in smeared AK8 jets
+slimmedJetsAK8SmearedUp = slimmedJetsAK8Smeared.clone(variation=cms.int32(1))
+selectedPatJetsAK8ByPtSmearedUp = selectedPatJetsAK8ByPt.clone(src=cms.InputTag("slimmedJetsAK8SmearedUp"))
+selectedPatJetsAK8SmearedUp = selectedPatJetsAK8.clone(src=cms.InputTag("selectedPatJetsAK8ByPtSmearedUp"))
+cleanJetsSmearedUp = cleanJets.clone(src="selectedPatJetsAK8SmearedUp")
+goodJetsSmearedUp = goodJets.clone(jets_src=cms.InputTag("cleanJetsSmearedUp"))
+bestJetSmearedUp = bestJet.clone(src=cms.InputTag("goodJetsSmearedUp"))
+fatJetsSequence *= (slimmedJetsAK8SmearedUp + selectedPatJetsAK8ByPtSmearedUp + selectedPatJetsAK8SmearedUp + cleanJetsSmearedUp + goodJetsSmearedUp + bestJetSmearedUp)
+
+slimmedJetsAK8SmearedDown = slimmedJetsAK8Smeared.clone(variation=cms.int32(-1))
+selectedPatJetsAK8ByPtSmearedDown = selectedPatJetsAK8ByPt.clone(src=cms.InputTag("slimmedJetsAK8SmearedDown"))
+selectedPatJetsAK8SmearedDown = selectedPatJetsAK8.clone(src=cms.InputTag("selectedPatJetsAK8ByPtSmearedDown"))
+cleanJetsSmearedDown = cleanJets.clone(src="selectedPatJetsAK8SmearedDown")
+goodJetsSmearedDown = goodJets.clone(jets_src=cms.InputTag("cleanJetsSmearedDown"))
+bestJetSmearedDown = bestJet.clone(src=cms.InputTag("goodJetsSmearedDown"))
+fatJetsSequence *= (slimmedJetsAK8SmearedDown + selectedPatJetsAK8ByPtSmearedDown + selectedPatJetsAK8SmearedDown + cleanJetsSmearedDown + goodJetsSmearedDown + bestJetSmearedDown)
 
 
 # Create a different collection of jets which  contains b-tagging information. This is necessary because slimmedJetsAK8 jets don't contain BTagInfo
