@@ -1517,15 +1517,17 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    //jet energy resolution uncertainty
-   if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
+   if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0 && isMC)  {
     lvj_p4_Up = smearedJetUp + SystMap.at("JetResUp");
-    lvj_p4_Down = smearedJetDown + SystMap.at("JetResDown");
     m_lvj_JERUp = lvj_p4_Up.M();
-    m_lvj_JERDown = lvj_p4_Down.M();
-
-   }
-   else {
+   } else {
     m_lvj_JERUp = -99.;
+   }
+
+   if (leptonicVs -> size() > 0 && jetsSmearedDown -> size() > 0 && isMC)  {
+    lvj_p4_Down = smearedJetDown + SystMap.at("JetResDown");
+    m_lvj_JERDown = lvj_p4_Down.M();
+   } else {
     m_lvj_JERDown = -99.;
    }
 
