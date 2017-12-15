@@ -50,6 +50,7 @@
 #include "TFile.h"
 #include "TH2F.h"
 #include "TLorentzVector.h"
+#include "TRandom.h"
 
 #include "DecayChannel.h"
 #include "GenWUtils.h"
@@ -84,6 +85,7 @@ private:
   virtual void endRun(edm::Run const& iEvent, edm::EventSetup const&) override;
   virtual void endJob() override;
   virtual float getPUPPIweight(float, float); 
+  virtual float getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax);
   virtual bool decaysHadronic(const reco::Candidate*);
  
   // ----------member data ---------------------------
@@ -197,6 +199,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::Candidate>> leptonicVToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> genParticlesToken_;
   edm::EDGetTokenT<edm::View<pat::Jet>> fatJetsToken_, fatJetsSmearedUpToken_, fatJetsSmearedDownToken_;
+  edm::EDGetTokenT<edm::View<reco::GenJet>> genJetsAK8Token_;
   edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_, AK4JetsSmearedUpToken_, AK4JetsSmearedDownToken_;
   edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseMuToken_;
@@ -231,6 +234,7 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   leptonicVToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("leptonicVSrc"))),
   genParticlesToken_(mayConsume<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("genSrc"))),
   fatJetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("fatJetSrc"))),
+  genJetsAK8Token_(consumes<edm::View<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genJetsAK8Src"))),
   AK4JetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("AK4JetSrc"))),
   vertexToken_(consumes<edm::View<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
   looseMuToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseMuSrc"))),
@@ -682,6 +686,9 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    edm::Handle<edm::View<pat::Jet> > jetsSmearedDown;
    iEvent.getByToken(fatJetsSmearedDownToken_, jetsSmearedDown);
+
+   edm::Handle<edm::View<reco::GenJet>> genJetsAK8;
+   iEvent.getByToken(genJetsAK8Token_, genJetsAK8);
 
    //AK4 Jets (for Btag veto )
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
@@ -1258,6 +1265,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       puppi_softdrop_subjet.SetPtEtaPhiM(it->correctedP4(0).pt(),it->correctedP4(0).eta(),it->correctedP4(0).phi(),it->correctedP4(0).mass());
       puppi_softdrop+=puppi_softdrop_subjet;
     }
+
     float puppiCorr= getPUPPIweight( jet_pt_PUPPI, jet_eta_PUPPI );
     jet_mass_softdrop_PUPPI = puppi_softdrop.M() * puppiCorr;
     jet_tau21_DT = jet_tau21_PUPPI + 0.063*std::log(jet_pt_PUPPI*jet_pt_PUPPI/jet_mass_PUPPI);
@@ -1287,6 +1295,12 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       jet_mass_softdrop_PUPPI_JECDown = (1 - JECunc)*jet_mass_softdrop_PUPPI;
       jet_mass_softdrop_PUPPI_JECUp = (1 + JECunc)*jet_mass_softdrop_PUPPI;
 
+      // Numbers taken from JetWTagging twiki
+      float mSDSF = 1.0;
+      float mSDSFUnc = 0.2;
+      float mSDResolutionAbs = 10.1;
+      float mSDResolutionRel = mSDResolutionAbs / 80.; // FIXME! Need better number than 80
+
       //JER uncertainty
       if (jetsSmearedUp->size() > 0) {
         const pat::Jet & fatJetUp = jetsSmearedUp->at(0);
@@ -1296,8 +1310,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         jet_mass_pruned_JERUp = JERUpCorrection*jet_mass_pruned;
         jet_mass_softdrop_JERUp = JERUpCorrection*jet_mass_softdrop;
         // For PUPPI SD mass, we treat it separately using official JMR SF & unc, and resolution.
+        // We don't have a gen level mass, so we'll use pT to calculate the factor for mass
         // see https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging
-        jet_mass_softdrop_PUPPI_JERUp = JERUpCorrection*jet_mass_softdrop_PUPPI;
+        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, 1, 0.4, 99999.);
+        jet_mass_softdrop_PUPPI_JERUp = c*jet_mass_softdrop_PUPPI;
         smearedJetUp = fatJetUp.p4();
       } else {
         jet_pt_JERUp = -99;
@@ -1314,7 +1330,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         double JERDownCorrection = fatJetDown.pt()/jet_pt;
         jet_mass_pruned_JERDown = JERDownCorrection*jet_mass_pruned;
         jet_mass_softdrop_JERDown = JERDownCorrection*jet_mass_softdrop;
-        jet_mass_softdrop_PUPPI_JERDown = JERDownCorrection*jet_mass_softdrop_PUPPI;
+        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, -1, 0.4, 99999.);
+        jet_mass_softdrop_PUPPI_JERDown = c*jet_mass_softdrop_PUPPI;
         smearedJetDown = fatJetDown.p4();
       } else {
         jet_pt_JERDown = -99;
@@ -1618,6 +1635,57 @@ float TreeMaker::getPUPPIweight(float puppipt, float puppieta){
   else totalWeight= recoCorr;
 
   return totalWeight;
+}
+
+
+float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax) {
+  // Calculate smearing factor using hybrid method
+  // https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
+  // i.e. rescale if match with gen-level object,
+  // otherwise use stochastic method with scaling drawn from Gaussian
+  // does matching with GenJets, using closest in dR, given some maximum dR
+  // and relative resolution criteria
+  //
+  // sf is the scale factor, unc is its uncertainty
+  // resolution is the relative pt resolution in simulation
+  // jet is the reco jet
+  // genJets are the colleciton of genJets to determine if there's a matching genJet
+  // variation is whether to do nominal(0), up (1), or down (-1)
+  // drMax is the maximum dR to count as a match with a genJet
+  // relResMax is the maximum relative reoslution to count as a match
+  if (!(variation==0 || abs(variation)==1)) {
+    throw std::runtime_error("variation must be 0 (nominal) or +/-1");
+  }
+
+  float jet_pt = jet.userFloat("ak8PFJetsPuppiValueMap:pt");
+
+  // First find if there's a match
+  float ptGen = -1.;
+  float dRBest = 9999;
+  for (const auto itr: genJets) {
+    float dR = deltaR(jet, itr);
+    float relRes = fabs(jet_pt - itr.pt())/jet_pt;
+    if (dR < drMax && relRes < relResMax && dR < dRBest) {
+      dRBest = dR;
+      ptGen = itr.pt();
+    }
+  }
+  // Now calc factor
+  float this_sf = sf + (variation * unc);
+  if (ptGen >= 0) {
+    // scaling method
+    // std::cout << "match" << std::endl;
+    // std::cout << jet.pt() << " : " << jet.eta() << " : " << jet.phi() << std::endl;
+    // std::cout << ptGen << " : " << etaGen << " : " << phiGen << std::endl;
+    return 1 + ((this_sf-1)*(1-(ptGen/jet_pt)));
+  } else {
+    // std::cout << "no match" << std::endl;
+    // stochastic method
+    // initialise seed with reproducible number
+    TRandom rand((int)(1000*jet.eta()));
+    float random_gauss = rand.Gaus(0, resolution);
+    return 1 + random_gauss * (sqrt(std::max((this_sf*this_sf) - 1, 0.0f)));
+  }
 }
 
 bool TreeMaker::decaysHadronic(const reco::Candidate* p)
