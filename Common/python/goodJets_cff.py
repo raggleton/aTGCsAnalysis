@@ -126,9 +126,6 @@ cleanAK4Jets.checkOverlaps.muons.src = "tightMuons"
 cleanAK4Jets.checkOverlaps.muons.deltaR = 0.3
 cleanAK4Jets.checkOverlaps.muons.requireNoOverlaps = True
 
-
-#cleanJets.checkOverlaps.muons = cms.PSet()
-
 cleanAK4Jets.checkOverlaps.electrons.src = "tightElectrons"
 cleanAK4Jets.checkOverlaps.electrons.deltaR = 0.3
 cleanAK4Jets.checkOverlaps.electrons.requireNoOverlaps = True
@@ -154,8 +151,18 @@ goodAK4Jets = cms.EDFilter("jetID",
                         jets_src = cms.InputTag("cleanAK4Jets"),
                         ID = cms.string("loose"))
 
-
-
-
 AK4JetsSequence = cms.Sequence(patAK4JetCorrFactorsReapplyJEC + slimmedJetsAK4NewJEC + slimmedJetsAK4Smeared + selectedPatJetsAK4 + cleanAK4Jets + goodAK4Jets)
 
+# Add in smeared AK4 jets
+slimmedJetsAK4SmearedUp = slimmedJetsAK4Smeared.clone(variation=cms.int32(1))
+selectedPatJetsAK4SmearedUp = selectedPatJetsAK4.clone(src=cms.InputTag("slimmedJetsAK4SmearedUp"))
+cleanAK4JetsSmearedUp = cleanAK4Jets.clone(src="selectedPatJetsAK4SmearedUp")
+goodAK4JetsSmearedUp = goodAK4Jets.clone(jets_src=cms.InputTag("cleanAK4JetsSmearedUp"))
+AK4JetsSequence *= (slimmedJetsAK4SmearedUp + selectedPatJetsAK4SmearedUp + cleanAK4JetsSmearedUp + goodAK4JetsSmearedUp)
+
+slimmedJetsAK4SmearedDown = slimmedJetsAK4Smeared.clone(variation=cms.int32(-1))
+selectedPatJetsAK4SmearedDown = selectedPatJetsAK4.clone(src=cms.InputTag("slimmedJetsAK4SmearedDown"))
+cleanAK4JetsSmearedDown = cleanAK4Jets.clone(src="selectedPatJetsAK4SmearedDown")
+goodAK4JetsSmearedDown = goodAK4Jets.clone(jets_src=cms.InputTag("cleanAK4JetsSmearedDown"))
+
+AK4JetsSequence *= (slimmedJetsAK4SmearedDown + selectedPatJetsAK4SmearedDown + cleanAK4JetsSmearedDown + goodAK4JetsSmearedDown)
