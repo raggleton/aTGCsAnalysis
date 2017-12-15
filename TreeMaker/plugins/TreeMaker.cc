@@ -196,7 +196,7 @@ private:
   edm::EDGetTokenT<edm::View<pat::MET> > metToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> leptonicVToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> genParticlesToken_;
-  edm::EDGetTokenT<edm::View<pat::Jet>> fatJetsToken_;
+  edm::EDGetTokenT<edm::View<pat::Jet>> fatJetsToken_, fatJetsSmearedUpToken_, fatJetsSmearedDownToken_;
   edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_, AK4JetsSmearedUpToken_, AK4JetsSmearedDownToken_;
   edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseMuToken_;
@@ -273,6 +273,10 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   //loading PU and generator information for MC
    if (isMC) {
      SystematicsHelper_  = SystematicsHelper(channel, consumesCollector());
+
+    // Use the AK8 jet label as basis
+    fatJetsSmearedUpToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("fatJetSrc").label() + "SmearedUp"));
+    fatJetsSmearedDownToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("fatJetSrc").label() + "SmearedDown"));
 
     // Use the AK4 jet label as basis
     AK4JetsSmearedUpToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "SmearedUp"));
@@ -671,7 +675,13 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //Jets
    edm::Handle<edm::View<pat::Jet> > jets; 
    iEvent.getByToken(fatJetsToken_, jets);
-   
+
+   edm::Handle<edm::View<pat::Jet> > jetsSmearedUp;
+   iEvent.getByToken(fatJetsSmearedUpToken_, jetsSmearedUp);
+
+   edm::Handle<edm::View<pat::Jet> > jetsSmearedDown;
+   iEvent.getByToken(fatJetsSmearedDownToken_, jetsSmearedDown);
+
    //AK4 Jets (for Btag veto )
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
    iEvent.getByToken(AK4JetsToken_, AK4Jets);
@@ -1208,8 +1218,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   NAK8jet = jets -> size();
+  NAK8jet_smearedUp = jetsSmearedUp -> size();
+  NAK8jet_smearedDown = jetsSmearedDown -> size();
   JetResolutionSmearer_.setRhoAndSeed(rho_, iEvent);
-  math::XYZTLorentzVector smearedJet, smearedJetUp, smearedJetDown;
+  math::XYZTLorentzVector smearedJetUp, smearedJetDown;
 
    if (jets -> size() > 0)
   {
@@ -1219,7 +1231,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jet_tau1 = fatJet.userFloat("NjettinessAK8:tau1");
     jet_tau2 = fatJet.userFloat("NjettinessAK8:tau2");
     jet_tau3 = fatJet.userFloat("NjettinessAK8:tau3");
-    // Need to manually apply correction factor to userFloat values - calcualte by using
+    // Need to manually apply correction factor to userFloat values - calculate by using
     // ratio of corrected PT to uncorrected pt
     double corr = fatJet.correctedP4(fatJet.currentJECLevel()).pt() / fatJet.correctedP4("Uncorrected").pt();
     jet_mass_pruned = corr * fatJet.userFloat("ak8PFJetsCHSPrunedMass");
@@ -1275,23 +1287,42 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       jet_mass_softdrop_PUPPI_JECUp = (1 + JECunc)*jet_mass_softdrop_PUPPI;
 
       //JER uncertainty
-      smearedJetUp = JetResolutionSmearer_.LorentzVectorWithSmearedPt(fatJet,Variation::UP);
-      smearedJetDown = JetResolutionSmearer_.LorentzVectorWithSmearedPt(fatJet,Variation::DOWN);
-      double JERUpCorrection = smearedJetUp.Pt()/jet_pt;
-      double JERDownCorrection = smearedJetDown.Pt()/jet_pt;
-      jet_pt_JERUp = smearedJetUp.Pt();
-      jet_pt_JERDown = smearedJetDown.Pt();
-      jet_mass_JERUp = smearedJetUp.M();
-      jet_mass_JERDown = smearedJetDown.M();
-      
-      jet_mass_pruned_JERUp = JERUpCorrection*jet_mass_pruned;
-      jet_mass_pruned_JERDown = JERDownCorrection*jet_mass_pruned;
-      
-      jet_mass_softdrop_JERUp = JERUpCorrection*jet_mass_softdrop;
-      jet_mass_softdrop_JERDown = JERDownCorrection*jet_mass_softdrop;
+      if (jetsSmearedUp->size() > 0) {
+        const pat::Jet & fatJetUp = jetsSmearedUp->at(0);
+        jet_pt_JERUp = fatJetUp.pt();
+        jet_mass_JERUp = fatJetUp.mass();
+        double JERUpCorrection = fatJetUp.pt()/jet_pt;
+        jet_mass_pruned_JERUp = JERUpCorrection*jet_mass_pruned;
+        jet_mass_softdrop_JERUp = JERUpCorrection*jet_mass_softdrop;
+        // For PUPPI SD mass, we treat it separately using official JMR SF & unc, and resolution.
+        // see https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging
+        jet_mass_softdrop_PUPPI_JERUp = JERUpCorrection*jet_mass_softdrop_PUPPI;
+        smearedJetUp = fatJetUp.p4();
+      } else {
+        jet_pt_JERUp = -99;
+        jet_mass_JERUp = -99;
+        jet_mass_pruned_JERUp = -99;
+        jet_mass_softdrop_JERUp = -99;
+        jet_mass_softdrop_PUPPI_JERUp = -99;
+      }
 
-      jet_mass_softdrop_PUPPI_JERUp = JERUpCorrection*jet_mass_softdrop_PUPPI;
-      jet_mass_softdrop_PUPPI_JERDown = JERDownCorrection*jet_mass_softdrop_PUPPI;
+      if (jetsSmearedDown->size() > 0) {
+        const pat::Jet & fatJetDown = jetsSmearedDown->at(0);
+        jet_pt_JERDown = fatJetDown.pt();
+        jet_mass_JERDown = fatJetDown.mass();
+        double JERDownCorrection = fatJetDown.pt()/jet_pt;
+        jet_mass_pruned_JERDown = JERDownCorrection*jet_mass_pruned;
+        jet_mass_softdrop_JERDown = JERDownCorrection*jet_mass_softdrop;
+        jet_mass_softdrop_PUPPI_JERDown = JERDownCorrection*jet_mass_softdrop_PUPPI;
+        smearedJetDown = fatJetDown.p4();
+      } else {
+        jet_pt_JERDown = -99;
+        jet_mass_JERDown = -99;
+        jet_mass_pruned_JERDown = -99;
+        jet_mass_softdrop_JERDown = -99;
+        jet_mass_softdrop_PUPPI_JERDown = -99;
+      }
+
     }
   }
   
