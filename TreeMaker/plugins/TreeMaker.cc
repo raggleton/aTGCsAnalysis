@@ -174,7 +174,7 @@ private:
   double MET_Phi_UnclEnUp, MET_Phi_UnclEnDown, MET_Phi_JECUp, MET_Phi_JECDown, MET_Phi_JERUp, MET_Phi_JERDown, MET_Phi_LeptonEnUp, MET_Phi_LeptonEnDown;
   
   //m_lvj
-  double m_lvj;
+  double m_lvj, m_lvj_SD;
   //m_lvj systematics
   double m_lvj_UnclEnUp, m_lvj_UnclEnDown, m_lvj_JECUp, m_lvj_JECDown, m_lvj_LeptonEnUp, m_lvj_LeptonEnDown, m_lvj_LeptonResUp, m_lvj_LeptonResDown, m_lvj_JERUp, m_lvj_JERDown;
 
@@ -610,7 +610,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("jet3_pt",  	      &jet3_pt,	          "jet3_pt/D"   );
   outTree_->Branch("jet3_btag",	      &jet3_btag,         "jet3_btag/D"   );
   
-  outTree_->Branch("MWW",	      &m_lvj,         "MWW/D"   );
+  outTree_->Branch("MWW",       &m_lvj,         "MWW/D"   );
+  outTree_->Branch("MWW_SD",	      &m_lvj_SD,         "MWW_SD/D"   );
   if (isMC) {
     outTree_->Branch("MWW_UnclEnUp",       &m_lvj_UnclEnUp,         "MWW_UnclEnUp/D"   );
     outTree_->Branch("MWW_UnclEnDown",       &m_lvj_UnclEnDown,         "MWW_UnclEnDown/D"   );      
@@ -1427,13 +1428,21 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   
   //diboson mass
-   ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > hadronicVp4, leptonicVp4, lvj_p4;
-   //hadronic W
-   hadronicVp4.SetPt((jets -> at(0)).pt());
-   hadronicVp4.SetEta((jets -> at(0)).eta());
-   hadronicVp4.SetPhi((jets -> at(0)).phi());
-   hadronicVp4.SetM((jets -> at(0)).mass());
+   ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > hadronicVp4, hadronicVp4_SD, leptonicVp4, lvj_p4, lvj_p4_SD;
+   //hadronic V
+   hadronicVp4.SetPt(jet_pt);
+   hadronicVp4.SetEta(jet_eta);
+   hadronicVp4.SetPhi(jet_phi);
+   hadronicVp4.SetM(jet_mass);
+
+   // hadronic V but with puppi SD mass
+   hadronicVp4_SD.SetPt(jet_pt);
+   hadronicVp4_SD.SetEta(jet_eta);
+   hadronicVp4_SD.SetPhi(jet_phi);
+   hadronicVp4_SD.SetM(jet_mass_softdrop_PUPPI);
+
    //std::cout<<"*Hadronically decaying W* "<<hadronicVp4.px()<<" "<<hadronicVp4.py()<<" "<<hadronicVp4.pz()<<" "<<hadronicVp4.e()<<" "<<hadronicVp4.M()<<std::endl;
+
    //leptonic W
    leptonicVp4.SetPt(Wboson_lep.pt);
    leptonicVp4.SetEta(Wboson_lep.eta);
@@ -1442,8 +1451,14 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //std::cout<<"*Leptonically decaying W* "<<leptonicVp4.px()<<" "<<leptonicVp4.py()<<" "<<leptonicVp4.pz()<<" "<<leptonicVp4.e()<<" "<<leptonicVp4.M()<<std::endl;
    
    lvj_p4 = hadronicVp4 + leptonicVp4;
-   if (leptonicVs -> size() > 0 && jets -> size() > 0)   m_lvj = lvj_p4.M();
-   else m_lvj = -99.;
+   lvj_p4_SD = hadronicVp4_SD + leptonicVp4;
+   if (leptonicVs -> size() > 0 && jets -> size() > 0) {
+    m_lvj = lvj_p4.M();
+    m_lvj_SD = lvj_p4_SD.M();
+   } else {
+    m_lvj = -99.;
+    m_lvj_SD = -99.;
+  }
    //std::cout<<"Diboson mass: "<<m_lvj<<std::endl<<std::endl;
    //std::cout<<"---------------------------------------"<<std::endl;
    //systematics
