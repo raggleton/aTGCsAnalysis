@@ -234,7 +234,7 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   leptonicVToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("leptonicVSrc"))),
   genParticlesToken_(mayConsume<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("genSrc"))),
   fatJetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("fatJetSrc"))),
-  genJetsAK8Token_(consumes<edm::View<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genJetsAK8Src"))),
+  genJetsAK8Token_(mayConsume<edm::View<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genJetsAK8Src"))),
   AK4JetsToken_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("AK4JetSrc"))),
   vertexToken_(consumes<edm::View<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
   looseMuToken_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("looseMuSrc"))),
@@ -688,7 +688,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(fatJetsSmearedDownToken_, jetsSmearedDown);
 
    edm::Handle<edm::View<reco::GenJet>> genJetsAK8;
-   iEvent.getByToken(genJetsAK8Token_, genJetsAK8);
+   if(isMC) iEvent.getByToken(genJetsAK8Token_, genJetsAK8);
 
    //AK4 Jets (for Btag veto )
    edm::Handle<edm::View<pat::Jet> > AK4Jets;
