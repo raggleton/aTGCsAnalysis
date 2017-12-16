@@ -86,6 +86,11 @@ private:
   virtual void endJob() override;
   virtual float getPUPPIweight(float, float); 
   virtual float getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax);
+  // we need all these 3 overloaded methods as we use different 4-vector classes
+  // math::XYZTLorentzVector is really a ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >
+  virtual void saveDibosonMass(const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & leptonicV_p4, const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & hadronicV_p4, double & massVar);
+  virtual void saveDibosonMass(math::XYZTLorentzVector & leptonicV_p4, const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & hadronicV_p4, double & massVar);
+  virtual void saveDibosonMass(math::XYZTLorentzVector & leptonicV_p4, math::XYZTLorentzVector & hadronicV_p4, double & massVar);
   virtual bool decaysHadronic(const reco::Candidate*);
  
   // ----------member data ---------------------------
@@ -1467,85 +1472,57 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    leptonicVp4.SetM(Wboson_lep.mass);
    //std::cout<<"*Leptonically decaying W* "<<leptonicVp4.px()<<" "<<leptonicVp4.py()<<" "<<leptonicVp4.pz()<<" "<<leptonicVp4.e()<<" "<<leptonicVp4.M()<<std::endl;
    
-   lvj_p4 = hadronicVp4 + leptonicVp4;
-   lvj_p4_SD = hadronicVp4_SD + leptonicVp4;
    if (leptonicVs -> size() > 0 && jets -> size() > 0) {
-    m_lvj = lvj_p4.M();
-    m_lvj_SD = lvj_p4_SD.M();
+     saveDibosonMass(leptonicVp4, hadronicVp4, m_lvj);
+     saveDibosonMass(leptonicVp4, hadronicVp4_SD, m_lvj_SD);
    } else {
-    m_lvj = -99.;
-    m_lvj_SD = -99.;
-  }
+     m_lvj = -99.;
+     m_lvj_SD = -99.;
+   }
    //std::cout<<"Diboson mass: "<<m_lvj<<std::endl<<std::endl;
    //std::cout<<"---------------------------------------"<<std::endl;
    //systematics
-   //METUnclEn
-   math::XYZTLorentzVector lvj_p4_Up, lvj_p4_Down;
-   if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
-     lvj_p4_Up = hadronicVp4 + SystMap.at("UnclusteredEnUp");
-     lvj_p4_Down = hadronicVp4 + SystMap.at("UnclusteredEnDown");
-     m_lvj_UnclEnUp = lvj_p4_Up.M();
-     m_lvj_UnclEnDown = lvj_p4_Down.M();
-   }
-   else {
+   if (isMC) {
      m_lvj_UnclEnUp = -99.;
      m_lvj_UnclEnDown = -99.;
-   }
-   //JEC
-    math::XYZTLorentzVector hadronicVp4_Up, hadronicVp4_Down;
-    hadronicVp4_Up = hadronicVp4;
-    hadronicVp4_Down = hadronicVp4;
-    hadronicVp4_Up *= (1+JECunc); 
-    hadronicVp4_Down *= (1-JECunc);
-   if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
-     lvj_p4_Up = hadronicVp4_Up + SystMap.at("JetEnUp");
-     lvj_p4_Down = hadronicVp4_Down + SystMap.at("JetEnDown");
-     m_lvj_JECUp = lvj_p4_Up.M();
-     m_lvj_JECDown = lvj_p4_Down.M();
-   }
-   else {
+
      m_lvj_JECUp = -99.;
      m_lvj_JECDown = -99.;
-   }
-   //lepton energy scale uncertainty
-   if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
-    lvj_p4_Up = hadronicVp4 + SystMap.at("LeptonEnUp");
-    lvj_p4_Down = hadronicVp4 + SystMap.at("LeptonEnDown");
-    m_lvj_LeptonEnUp = lvj_p4_Up.M();
-    m_lvj_LeptonEnDown = lvj_p4_Down.M();
 
-   }
-   else {
-    m_lvj_LeptonEnUp = -99.;
-    m_lvj_LeptonEnDown = -99.;
-   }
+     m_lvj_LeptonEnUp = -99.;
+     m_lvj_LeptonEnDown = -99.;
 
-   //lepton energy resolution uncertainty
-   if (leptonicVs -> size() > 0 && jets -> size() > 0 && isMC)  {
-    lvj_p4_Up = hadronicVp4 + SystMap.at("LeptonResUp");
-    lvj_p4_Down = hadronicVp4 + SystMap.at("LeptonResDown");
-    m_lvj_LeptonResUp = lvj_p4_Up.M();
-    m_lvj_LeptonResDown = lvj_p4_Down.M();
+     m_lvj_LeptonResUp = -99.;
+     m_lvj_LeptonResDown = -99.;
 
-   }
-   else {
-    m_lvj_LeptonResUp = -99.;
-    m_lvj_LeptonResDown = -99.;
-   }
+     m_lvj_JERUp = -99.;
+     m_lvj_JERDown = -99.;
 
-   //jet energy resolution uncertainty
-   if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0 && isMC)  {
-    lvj_p4_Up = smearedJetUp + SystMap.at("JetResUp");
-    m_lvj_JERUp = lvj_p4_Up.M();
-   } else {
-    m_lvj_JERUp = -99.;
-   }
+     if (leptonicVs -> size() > 0 && jets -> size() > 0) {
+       //METUnclEn
+       saveDibosonMass(SystMap.at("UnclusteredEnUp"), hadronicVp4, m_lvj_UnclEnUp);
+       saveDibosonMass(SystMap.at("UnclusteredEnDown"), hadronicVp4, m_lvj_UnclEnDown);
 
-   if (leptonicVs -> size() > 0 && jetsSmearedDown -> size() > 0 && isMC)  {
-    lvj_p4_Down = smearedJetDown + SystMap.at("JetResDown");
-    m_lvj_JERDown = lvj_p4_Down.M();
-   } else {
-    m_lvj_JERDown = -99.;
+       //JEC
+       saveDibosonMass(SystMap.at("JetEnUp"), hadronicVp4*(1+JECunc), m_lvj_JECUp);
+       saveDibosonMass(SystMap.at("JetEnDown"), hadronicVp4*(1+JECunc), m_lvj_JECDown);
+
+       //lepton energy scale uncertainty
+       saveDibosonMass(SystMap.at("LeptonEnUp"), hadronicVp4, m_lvj_LeptonEnUp);
+       saveDibosonMass(SystMap.at("LeptonEnDown"), hadronicVp4, m_lvj_LeptonEnDown);
+
+       //lepton energy resolution uncertainty
+       saveDibosonMass(SystMap.at("LeptonResUp"), hadronicVp4, m_lvj_LeptonResUp);
+       saveDibosonMass(SystMap.at("LeptonResDown"), hadronicVp4, m_lvj_LeptonResDown);
+     }
+
+     //jet energy resolution uncertainty
+     if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0) {
+       saveDibosonMass(SystMap.at("JetResUp"), smearedJetUp, m_lvj_JERUp);
+     }
+     if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0) {
+       saveDibosonMass(SystMap.at("JetResDown"), smearedJetDown, m_lvj_JERDown);
+     }
    }
 
    edm::Handle<edm::TriggerResults> Triggers;
@@ -1687,6 +1664,25 @@ float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const 
     return 1 + random_gauss * (sqrt(std::max((this_sf*this_sf) - 1, 0.0f)));
   }
 }
+
+void TreeMaker::saveDibosonMass(const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & leptonicV_p4, const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & hadronicV_p4, double & massVar)
+{
+  auto lvj_p4 = leptonicV_p4 + hadronicV_p4;
+  massVar = lvj_p4.M();
+}
+
+void TreeMaker::saveDibosonMass(math::XYZTLorentzVector & leptonicV_p4, const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & hadronicV_p4, double & massVar)
+{
+  auto lvj_p4 = leptonicV_p4 + hadronicV_p4;
+  massVar = lvj_p4.M();
+}
+
+void TreeMaker::saveDibosonMass(math::XYZTLorentzVector & leptonicV_p4, math::XYZTLorentzVector & hadronicV_p4, double & massVar)
+{
+  auto lvj_p4 = leptonicV_p4 + hadronicV_p4;
+  massVar = lvj_p4.M();
+}
+
 
 bool TreeMaker::decaysHadronic(const reco::Candidate* p)
 {
