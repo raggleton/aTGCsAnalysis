@@ -1472,7 +1472,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    leptonicVp4.SetM(Wboson_lep.mass);
    //std::cout<<"*Leptonically decaying W* "<<leptonicVp4.px()<<" "<<leptonicVp4.py()<<" "<<leptonicVp4.pz()<<" "<<leptonicVp4.e()<<" "<<leptonicVp4.M()<<std::endl;
    
-   if (leptonicVs -> size() > 0 && jets -> size() > 0) {
+   if (leptonicVs -> size() > 0) {
      saveDibosonMass(leptonicVp4, hadronicVp4, m_lvj);
      saveDibosonMass(leptonicVp4, hadronicVp4_SD, m_lvj_SD);
    } else {
@@ -1498,7 +1498,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      m_lvj_JERUp = -99.;
      m_lvj_JERDown = -99.;
 
-     if (leptonicVs -> size() > 0 && jets -> size() > 0) {
+     if (leptonicVs -> size() > 0) {
        //METUnclEn
        saveDibosonMass(SystMap.at("UnclusteredEnUp"), hadronicVp4, m_lvj_UnclEnUp);
        saveDibosonMass(SystMap.at("UnclusteredEnDown"), hadronicVp4, m_lvj_UnclEnDown);
