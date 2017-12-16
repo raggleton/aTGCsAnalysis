@@ -1662,7 +1662,7 @@ float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const 
   // First find if there's a match
   float ptGen = -1.;
   float dRBest = 9999;
-  for (const auto itr: genJets) {
+  for (const auto & itr: genJets) {
     float dR = deltaR(jet, itr);
     float relRes = fabs(jet_pt - itr.pt())/jet_pt;
     if (dR < drMax && relRes < relResMax && dR < dRBest) {
