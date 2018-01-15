@@ -37,7 +37,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 
 	var.VarName = "MWW";
 	var.Title = "m_{WV}";
-	var.SetRange(900., 3500.);
+	var.SetRange(900., 4500.);
 	variables.push_back(var);
 
 	var.VarName = "nPV";
