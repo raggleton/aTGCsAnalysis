@@ -85,7 +85,7 @@ private:
   virtual void endRun(edm::Run const& iEvent, edm::EventSetup const&) override;
   virtual void endJob() override;
   virtual float getPUPPIweight(float, float); 
-  virtual float getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax);
+  virtual float getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax, bool usePuppiPt);
   // we need all these 3 overloaded methods as we use different 4-vector classes
   // math::XYZTLorentzVector is really a ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >
   virtual void saveDibosonMass(const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & leptonicV_p4, const ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > & hadronicV_p4, double & massVar);
@@ -140,10 +140,10 @@ private:
   double deltaPhi_WJetMet_UnclEnUp, deltaPhi_WJetMet_UnclEnDown, deltaPhi_WJetMet_JECUp,deltaPhi_WJetMet_JECDown, deltaPhi_WJetMet_JERUp, deltaPhi_WJetMet_JERDown, deltaPhi_WJetMet_LeptonEnUp, deltaPhi_WJetMet_LeptonEnDown;
   double deltaPhi_WJetWlep_UnclEnUp, deltaPhi_WJetWlep_UnclEnDown, deltaPhi_WJetWlep_JECUp, deltaPhi_WJetWlep_JECDown, deltaPhi_WJetWlep_LeptonEnUp, deltaPhi_WJetWlep_LeptonEnDown;
   
-  //Jets
-  int NAK8jet, njets, nbtag;
-  int NAK8jet_smearedUp, njets_smearedUp, nbtag_smearedUp;
-  int NAK8jet_smearedDown, njets_smearedDown, nbtag_smearedDown;
+  // Jet quantities
+  int NAK8jet, NAK8jet_smearedUp, NAK8jet_smearedDown;
+  int njets, njets_JERUp, njets_JERDown;
+  int nbtag, nbtag_JERUp, nbtag_JERDown;
 
   double jet_pt, jet_eta, jet_phi, jet_mass, jet_mass_pruned, jet_mass_softdrop, jet_tau2tau1, jet_tau3tau2, jet_tau1, jet_tau2, jet_tau3;
   //PUPPI variables 
@@ -608,11 +608,11 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("nbtag",         &nbtag,           "nbtag/I"   );
 
   if (isMC) {
-    outTree_->Branch("njets_JERUp",         &njets_smearedUp,           "njets_JERUp/I"   );
-    outTree_->Branch("nbtag_JERUp",         &nbtag_smearedUp,           "nbtag_JERUp/I"   );
+    outTree_->Branch("njets_JERUp",         &njets_JERUp,           "njets_JERUp/I"   );
+    outTree_->Branch("njets_JERDown",       &njets_JERDown,         "njets_JERDown/I"   );
 
-    outTree_->Branch("njets_JERDown",         &njets_smearedDown,           "njets_JERDown/I"   );
-    outTree_->Branch("nbtag_JERDown",         &nbtag_smearedDown,           "nbtag_JERDown/I"   );
+    outTree_->Branch("nbtag_JERUp",         &nbtag_JERUp,           "nbtag_JERUp/I"   );
+    outTree_->Branch("nbtag_JERDown",       &nbtag_JERDown,         "nbtag_JERDown/I"   );
   }
   
   outTree_->Branch("jet2_pt",  	      &jet2_pt,	          "jet2_pt/D"   );
@@ -712,13 +712,15 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(AK4JetsToken_, AK4Jets);
    njets = AK4Jets->size();
 
-   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedUp;
-   iEvent.getByToken(AK4JetsSmearedUpToken_, AK4JetsSmearedUp);
-   njets_smearedUp = AK4JetsSmearedUp->size();
-
-   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedDown;
-   iEvent.getByToken(AK4JetsSmearedDownToken_, AK4JetsSmearedDown);
-   njets_smearedDown = AK4JetsSmearedDown->size();
+   njets_JERUp = 0;
+   njets_JERDown = 0;
+   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedUp, AK4JetsSmearedDown;
+   if(isMC) {
+     iEvent.getByToken(AK4JetsSmearedUpToken_, AK4JetsSmearedUp);
+     njets_JERUp = AK4JetsSmearedUp->size();
+     iEvent.getByToken(AK4JetsSmearedDownToken_, AK4JetsSmearedDown);
+     njets_JERDown = AK4JetsSmearedDown->size();
+   }
    
    //MET
    edm::Handle<edm::View<pat::MET> > metHandle;
@@ -1333,7 +1335,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         // For PUPPI SD mass, we treat it separately using official JMR SF & unc, and resolution.
         // We don't have a gen level mass, so we'll use pT to calculate the factor for mass
         // see https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging
-        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, 1, 0.4, 99999.);
+        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, 1, 0.4, 99999., true);
         jet_mass_softdrop_PUPPI_JERUp = c*jet_mass_softdrop_PUPPI;
         smearedJetUp = fatJetUp.p4();
         smearedJetUp_SD.SetPt(fatJetUp.pt());
@@ -1355,7 +1357,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         double JERDownCorrection = fatJetDown.pt()/jet_pt;
         jet_mass_pruned_JERDown = JERDownCorrection*jet_mass_pruned;
         jet_mass_softdrop_JERDown = JERDownCorrection*jet_mass_softdrop;
-        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, -1, 0.4, 99999.);
+        float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, -1, 0.4, 99999., true);
         jet_mass_softdrop_PUPPI_JERDown = c*jet_mass_softdrop_PUPPI;
         smearedJetDown = fatJetDown.p4();
         smearedJetDown_SD.SetPt(fatJetDown.pt());
@@ -1414,8 +1416,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   // Count number of btagged AK4 jets
   nbtag = 0;
-  nbtag_smearedUp = 0;
-  nbtag_smearedDown = 0;
+  nbtag_JERUp = 0;
+  nbtag_JERDown = 0;
   for (const auto & itr : *AK4Jets)
   {
     //taken from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X#Supported_Algorithms_and_Operati
@@ -1429,14 +1431,14 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if (isMC) {
     for (const auto & itr : *AK4JetsSmearedUp) {
       if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
-        nbtag_smearedUp++;
+        nbtag_JERUp++;
       }
       // std::cout << "Up " << itr.pt() << " : " << itr.eta() << std::endl;
     }
 
     for (const auto & itr : *AK4JetsSmearedDown) {
       if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
-        nbtag_smearedDown++;
+        nbtag_JERDown++;
       }
       // std::cout << "Down " << itr.pt() << " : " << itr.eta() << std::endl;
     }
@@ -1669,7 +1671,7 @@ float TreeMaker::getPUPPIweight(float puppipt, float puppieta){
 }
 
 
-float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax) {
+float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const pat::Jet & jet, const edm::View<reco::GenJet> & genJets, int variation, float drMax, float relResMax, bool usePuppiPt) {
   // Calculate smearing factor using hybrid method
   // https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution
   // i.e. rescale if match with gen-level object,
@@ -1680,15 +1682,16 @@ float TreeMaker::getSmearingFactor(float sf, float unc, float resolution, const 
   // sf is the scale factor, unc is its uncertainty
   // resolution is the relative pt resolution in simulation
   // jet is the reco jet
-  // genJets are the colleciton of genJets to determine if there's a matching genJet
+  // genJets are the collection of genJets to determine if there's a matching genJet
   // variation is whether to do nominal(0), up (1), or down (-1)
   // drMax is the maximum dR to count as a match with a genJet
   // relResMax is the maximum relative reoslution to count as a match
+  // usePuppiPt is a bool to control whether to use Puppi Pt or normal pt for the reco jet
   if (!(variation==0 || abs(variation)==1)) {
     throw std::runtime_error("variation must be 0 (nominal) or +/-1");
   }
 
-  float jet_pt = jet.userFloat("ak8PFJetsPuppiValueMap:pt");
+  float jet_pt = usePuppiPt ? jet.userFloat("ak8PFJetsPuppiValueMap:pt") : jet.pt();
 
   // First find if there's a match
   float ptGen = -1.;
