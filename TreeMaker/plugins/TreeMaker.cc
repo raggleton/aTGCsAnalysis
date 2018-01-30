@@ -184,6 +184,7 @@ private:
   double m_lvj, m_lvj_SD;
   //m_lvj systematics
   double m_lvj_UnclEnUp, m_lvj_UnclEnDown, m_lvj_JECUp, m_lvj_JECDown, m_lvj_LeptonEnUp, m_lvj_LeptonEnDown, m_lvj_LeptonResUp, m_lvj_LeptonResDown, m_lvj_JERUp, m_lvj_JERDown;
+  double m_lvj_SD_UnclEnUp, m_lvj_SD_UnclEnDown, m_lvj_SD_JECUp, m_lvj_SD_JECDown, m_lvj_SD_LeptonEnUp, m_lvj_SD_LeptonEnDown, m_lvj_SD_LeptonResUp, m_lvj_SD_LeptonResDown, m_lvj_SD_JERUp, m_lvj_SD_JERDown;
 
   double refXsec;
   //aTGC weights
@@ -632,6 +633,17 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     outTree_->Branch("MWW_LeptonResDown",       &m_lvj_LeptonResDown,         "MWW_LeptonResDown/D"   );   
     outTree_->Branch("MWW_JERUp",       &m_lvj_JERUp,         "MWW_JERUp/D"   );
     outTree_->Branch("MWW_JERDown",       &m_lvj_JERDown,         "MWW_JERDown/D"   );       
+
+    outTree_->Branch("MWW_SD_UnclEnUp",       &m_lvj_SD_UnclEnUp,         "MWW_SD_UnclEnUp/D"   );
+    outTree_->Branch("MWW_SD_UnclEnDown",       &m_lvj_SD_UnclEnDown,         "MWW_SD_UnclEnDown/D"   );
+    outTree_->Branch("MWW_SD_JECUp",       &m_lvj_SD_JECUp,         "MWW_SD_JECUp/D"   );
+    outTree_->Branch("MWW_SD_JECDown",       &m_lvj_SD_JECDown,         "MWW_SD_JECDown/D"   );
+    outTree_->Branch("MWW_SD_LeptonEnUp",       &m_lvj_SD_LeptonEnUp,         "MWW_SD_LeptonEnUp/D"   );
+    outTree_->Branch("MWW_SD_LeptonEnDown",       &m_lvj_SD_LeptonEnDown,         "MWW_SD_LeptonEnDown/D"   );
+    outTree_->Branch("MWW_SD_LeptonResUp",       &m_lvj_SD_LeptonResUp,         "MWW_SD_LeptonResUp/D"   );
+    outTree_->Branch("MWW_SD_LeptonResDown",       &m_lvj_SD_LeptonResDown,         "MWW_SD_LeptonResDown/D"   );
+    outTree_->Branch("MWW_SD_JERUp",       &m_lvj_SD_JERUp,         "MWW_SD_JERUp/D"   );
+    outTree_->Branch("MWW_SD_JERDown",       &m_lvj_SD_JERDown,         "MWW_SD_JERDown/D"   );
   }
 
  if (isSignal) {
@@ -1234,7 +1246,11 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   NAK8jet_smearedUp = jetsSmearedUp -> size();
   NAK8jet_smearedDown = jetsSmearedDown -> size();
   JetResolutionSmearer_.setRhoAndSeed(rho_, iEvent);
+
+  // Different types because the pat::Jet returns math::XYZTLorentzVector (uses E not M)
+  // but for the SD ones we need to modify the mass, so need the M4D not E4D
   math::XYZTLorentzVector smearedJetUp, smearedJetDown;
+  ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > smearedJetUp_SD, smearedJetDown_SD;
 
    if (jets -> size() > 0)
   {
@@ -1320,6 +1336,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, 1, 0.4, 99999.);
         jet_mass_softdrop_PUPPI_JERUp = c*jet_mass_softdrop_PUPPI;
         smearedJetUp = fatJetUp.p4();
+        smearedJetUp_SD.SetPt(fatJetUp.pt());
+        smearedJetUp_SD.SetEta(fatJetUp.eta());
+        smearedJetUp_SD.SetPhi(fatJetUp.phi());
+        smearedJetUp_SD.SetM(jet_mass_softdrop_JERUp);
       } else {
         jet_pt_JERUp = -99;
         jet_mass_JERUp = -99;
@@ -1338,6 +1358,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         float c = getSmearingFactor(mSDSF, mSDSFUnc, mSDResolutionRel, fatJet, *genJetsAK8, -1, 0.4, 99999.);
         jet_mass_softdrop_PUPPI_JERDown = c*jet_mass_softdrop_PUPPI;
         smearedJetDown = fatJetDown.p4();
+        smearedJetDown_SD.SetPt(fatJetDown.pt());
+        smearedJetDown_SD.SetEta(fatJetDown.eta());
+        smearedJetDown_SD.SetPhi(fatJetDown.phi());
+        smearedJetDown_SD.SetM(jet_mass_softdrop_JERDown);
       } else {
         jet_pt_JERDown = -99;
         jet_mass_JERDown = -99;
@@ -1498,30 +1522,60 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      m_lvj_JERUp = -99.;
      m_lvj_JERDown = -99.;
 
+     // SD versions
+     m_lvj_SD_UnclEnUp = -99.;
+     m_lvj_SD_UnclEnDown = -99.;
+
+     m_lvj_SD_JECUp = -99.;
+     m_lvj_SD_JECDown = -99.;
+
+     m_lvj_SD_LeptonEnUp = -99.;
+     m_lvj_SD_LeptonEnDown = -99.;
+
+     m_lvj_SD_LeptonResUp = -99.;
+     m_lvj_SD_LeptonResDown = -99.;
+
+     m_lvj_SD_JERUp = -99.;
+     m_lvj_SD_JERDown = -99.;
+
      if (leptonicVs -> size() > 0) {
        //METUnclEn
        saveDibosonMass(SystMap.at("UnclusteredEnUp"), hadronicVp4, m_lvj_UnclEnUp);
        saveDibosonMass(SystMap.at("UnclusteredEnDown"), hadronicVp4, m_lvj_UnclEnDown);
 
+       saveDibosonMass(SystMap.at("UnclusteredEnUp"), hadronicVp4_SD, m_lvj_SD_UnclEnUp);
+       saveDibosonMass(SystMap.at("UnclusteredEnDown"), hadronicVp4_SD, m_lvj_SD_UnclEnDown);
+
        //JEC
        saveDibosonMass(SystMap.at("JetEnUp"), hadronicVp4*(1+JECunc), m_lvj_JECUp);
        saveDibosonMass(SystMap.at("JetEnDown"), hadronicVp4*(1+JECunc), m_lvj_JECDown);
+
+       saveDibosonMass(SystMap.at("JetEnUp"), hadronicVp4_SD*(1+JECunc), m_lvj_SD_JECUp);
+       saveDibosonMass(SystMap.at("JetEnDown"), hadronicVp4_SD*(1+JECunc), m_lvj_SD_JECDown);
 
        //lepton energy scale uncertainty
        saveDibosonMass(SystMap.at("LeptonEnUp"), hadronicVp4, m_lvj_LeptonEnUp);
        saveDibosonMass(SystMap.at("LeptonEnDown"), hadronicVp4, m_lvj_LeptonEnDown);
 
+       saveDibosonMass(SystMap.at("LeptonEnUp"), hadronicVp4_SD, m_lvj_SD_LeptonEnUp);
+       saveDibosonMass(SystMap.at("LeptonEnDown"), hadronicVp4_SD, m_lvj_SD_LeptonEnDown);
+
        //lepton energy resolution uncertainty
        saveDibosonMass(SystMap.at("LeptonResUp"), hadronicVp4, m_lvj_LeptonResUp);
        saveDibosonMass(SystMap.at("LeptonResDown"), hadronicVp4, m_lvj_LeptonResDown);
+
+       saveDibosonMass(SystMap.at("LeptonResUp"), hadronicVp4_SD, m_lvj_SD_LeptonResUp);
+       saveDibosonMass(SystMap.at("LeptonResDown"), hadronicVp4_SD, m_lvj_SD_LeptonResDown);
      }
 
      //jet energy resolution uncertainty
      if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0) {
        saveDibosonMass(SystMap.at("JetResUp"), smearedJetUp, m_lvj_JERUp);
+       saveDibosonMass(SystMap.at("JetResUp"), smearedJetUp_SD, m_lvj_SD_JERUp);
      }
      if (leptonicVs -> size() > 0 && jetsSmearedUp -> size() > 0) {
        saveDibosonMass(SystMap.at("JetResDown"), smearedJetDown, m_lvj_JERDown);
+       saveDibosonMass(SystMap.at("JetResDown"), smearedJetDown_SD, m_lvj_SD_JERDown);
      }
    }
 
