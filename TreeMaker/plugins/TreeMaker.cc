@@ -141,9 +141,9 @@ private:
   double deltaPhi_WJetWlep_UnclEnUp, deltaPhi_WJetWlep_UnclEnDown, deltaPhi_WJetWlep_JECUp, deltaPhi_WJetWlep_JECDown, deltaPhi_WJetWlep_LeptonEnUp, deltaPhi_WJetWlep_LeptonEnDown;
   
   // Jet quantities
-  int NAK8jet, NAK8jet_smearedUp, NAK8jet_smearedDown;
-  int njets, njets_JERUp, njets_JERDown;
-  int nbtag, nbtag_JERUp, nbtag_JERDown;
+  int NAK8jet, NAK8jet_smearedUp, NAK8jet_smearedDown, NAK8jet_JECUp, NAK8jet_JECDown;
+  int njets, njets_JERUp, njets_JERDown, njets_JECUp, njets_JECDown;
+  int nbtag, nbtag_JERUp, nbtag_JERDown, nbtag_JECUp, nbtag_JECDown;
 
   double jet_pt, jet_eta, jet_phi, jet_mass, jet_mass_pruned, jet_mass_softdrop, jet_tau2tau1, jet_tau3tau2, jet_tau1, jet_tau2, jet_tau3;
   //PUPPI variables 
@@ -206,7 +206,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::Candidate>> genParticlesToken_;
   edm::EDGetTokenT<edm::View<pat::Jet>> fatJetsToken_, fatJetsSmearedUpToken_, fatJetsSmearedDownToken_;
   edm::EDGetTokenT<edm::View<reco::GenJet>> genJetsAK8Token_;
-  edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_, AK4JetsSmearedUpToken_, AK4JetsSmearedDownToken_;
+  edm::EDGetTokenT<edm::View<pat::Jet>> AK4JetsToken_, AK4JetsSmearedUpToken_, AK4JetsSmearedDownToken_, AK4JetsShiftedUpToken_, AK4JetsShiftedDownToken_;
   edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseMuToken_;
   edm::EDGetTokenT<edm::View<reco::Candidate>> looseEleToken_;
@@ -291,6 +291,9 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
     // Use the AK4 jet label as basis
     AK4JetsSmearedUpToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "SmearedUp"));
     AK4JetsSmearedDownToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "SmearedDown"));
+
+    AK4JetsShiftedUpToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "ShiftedUp"));
+    AK4JetsShiftedDownToken_ = consumes<edm::View<pat::Jet>>(edm::InputTag(iConfig.getParameter<edm::InputTag>("AK4JetSrc").label() + "ShiftedDown"));
 
      PUInfoToken_ = consumes<std::vector< PileupSummaryInfo > >(iConfig.getParameter<edm::InputTag>("PUInfo"));
 
@@ -613,6 +616,13 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
 
     outTree_->Branch("nbtag_JERUp",         &nbtag_JERUp,           "nbtag_JERUp/I"   );
     outTree_->Branch("nbtag_JERDown",       &nbtag_JERDown,         "nbtag_JERDown/I"   );
+
+    outTree_->Branch("njets_JECUp",         &njets_JECUp,           "njets_JECRUp/I"   );
+    outTree_->Branch("njets_JECDown",       &njets_JECDown,         "njets_JECDown/I"   );
+
+    outTree_->Branch("nbtag_JECUp",         &nbtag_JECUp,           "nbtag_JECUp/I"   );
+    outTree_->Branch("nbtag_JECDown",       &nbtag_JECDown,         "nbtag_JECDown/I"   );
+
   }
   
   outTree_->Branch("jet2_pt",  	      &jet2_pt,	          "jet2_pt/D"   );
@@ -714,12 +724,19 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    njets_JERUp = 0;
    njets_JERDown = 0;
-   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedUp, AK4JetsSmearedDown;
+   njets_JECUp = 0;
+   njets_JECDown = 0;
+   edm::Handle<edm::View<pat::Jet> > AK4JetsSmearedUp, AK4JetsSmearedDown, AK4JetsShiftedUp, AK4JetsShiftedDown;
    if(isMC) {
      iEvent.getByToken(AK4JetsSmearedUpToken_, AK4JetsSmearedUp);
      njets_JERUp = AK4JetsSmearedUp->size();
      iEvent.getByToken(AK4JetsSmearedDownToken_, AK4JetsSmearedDown);
      njets_JERDown = AK4JetsSmearedDown->size();
+
+     iEvent.getByToken(AK4JetsShiftedUpToken_, AK4JetsShiftedUp);
+     njets_JECUp = AK4JetsShiftedUp->size();
+     iEvent.getByToken(AK4JetsShiftedDownToken_, AK4JetsShiftedDown);
+     njets_JECDown = AK4JetsShiftedDown->size();
    }
    
    //MET
@@ -1416,6 +1433,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   // Count number of btagged AK4 jets
   nbtag = 0;
+  nbtag_JECUp = 0;
+  nbtag_JECDown = 0;
   nbtag_JERUp = 0;
   nbtag_JERDown = 0;
   for (const auto & itr : *AK4Jets)
@@ -1424,7 +1443,7 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if((itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
       nbtag ++;
     }
-    // std::cout << "Nominal " << itr.pt() << " : " << itr.eta() << std::endl;
+    // std::cout << "Nominal " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
     if(isMC) jetFlavours.push_back(itr.partonFlavour());
   }
 
@@ -1433,14 +1452,28 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
         nbtag_JERUp++;
       }
-      // std::cout << "Up " << itr.pt() << " : " << itr.eta() << std::endl;
+      // std::cout << "Smeared Up " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
     }
 
     for (const auto & itr : *AK4JetsSmearedDown) {
       if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
         nbtag_JERDown++;
       }
-      // std::cout << "Down " << itr.pt() << " : " << itr.eta() << std::endl;
+      // std::cout << "Smeared Down " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
+    }
+
+    for (const auto & itr : *AK4JetsShiftedUp) {
+      if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
+        nbtag_JECUp++;
+      }
+      // std::cout << "Shifted Up " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
+    }
+
+    for (const auto & itr : *AK4JetsShiftedDown) {
+      if (itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > bTagDiscrCut) {
+        nbtag_JECDown++;
+      }
+      // std::cout << "Shifted Down " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
     }
   }
  
