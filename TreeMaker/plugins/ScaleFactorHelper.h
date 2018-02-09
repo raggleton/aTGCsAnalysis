@@ -242,6 +242,13 @@ public:
   const float systematic_Iso = 0.005;
   const float systematic_Trigger = 0.005;
 
+  // These are the pt & eta range in which the trigger SF are totally unreliable.
+  // In 2016 data, trig efficiencies for muons with pT > 500 in the muon endcaps
+  // are badly measured, and are better dropped. Not a big effect for us,
+  // as very few muons in that corner of phase space.
+  const float trig_bad_pt = 500.;
+  const float trig_bad_eta = 1.2;
+
   float getTrackingScaleFactor(float eta, int nVertices) {
     // NB although lumi and/or phi graphs in ROOT files, only recommended to use eta & nPV
     // (prob wise to check this periodically)
@@ -307,15 +314,22 @@ public:
   }
 
   float getTriggerScaleFactor(float pt, float eta) {
-    float pt_eta_sf = getBinContent(hist_trigger_sf_pt_eta.get(), pt, fabs(eta));
-    return pt_eta_sf;
+    if (pt > trig_bad_pt && fabs(eta) > trig_bad_eta) {
+      return 0.;
+    } else {
+      return getBinContent(hist_trigger_sf_pt_eta.get(), pt, fabs(eta));
+    }
   }
 
   float getTriggerScaleFactorUncert(float pt, float eta) {
     // Get statistical + systematic uncertainty on SF
-    float pt_eta_sf_uncert = getBinError(hist_trigger_sf_pt_eta.get(), pt, fabs(eta));
-    float syst_uncert = systematic_Trigger * getTriggerScaleFactor(pt, eta);
-    return std::hypot(pt_eta_sf_uncert, syst_uncert);
+    if (pt > trig_bad_pt && fabs(eta) > trig_bad_eta) {
+      return 0.;
+    } else {
+      float pt_eta_sf_uncert = getBinError(hist_trigger_sf_pt_eta.get(), pt, fabs(eta));
+      float syst_uncert = systematic_Trigger * getTriggerScaleFactor(pt, eta);
+      return std::hypot(pt_eta_sf_uncert, syst_uncert);
+    }
   }
 
   float getScaleFactor(float pt, float eta, float phi, int nVertices, const std::string & variation="") {
