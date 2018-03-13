@@ -42,7 +42,7 @@ def SetSystematicsFromFile(file_, histNominal_, ListOfSystematics_):
 
 
 
-def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,binhi=3500):
+def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,binhi=4500):
 
 	if cat == 'WW':
 		sigreg 	= 'lo'
@@ -271,7 +271,7 @@ def main(options):
 	canvas.SetLogy()
 
 	low = 900.
-	high = 3500.
+	high = 4500.
 	step = (high - low)/1000
 	for iATGC in POI:
 		legend = TLegend(0.7,0.7,0.9,0.8)
@@ -304,6 +304,7 @@ def main(options):
 		graph.SetFillStyle(3010)
 		graph.GetXaxis().SetTitle("m_{WV}")
 		graph.GetYaxis().SetTitle("arb. units")
+		graph.GetYaxis().SetRangeUser(1e-6,1e-2)
 		graph.SetLineWidth(4)
 		graph.SetLineColor(kRed)
 		legend.AddEntry(graph, iATGC,"l")
