@@ -1,4 +1,4 @@
-#include <Sample.hpp>
+#include "Sample.hpp"
 Sample::Sample()
 {
 	weight  = 1.;

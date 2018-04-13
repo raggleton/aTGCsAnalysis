@@ -18,11 +18,11 @@ def DefineNJobs(sample):
 	if sample in CACHED_DATASETS:
 		N = CACHED_DATASETS[sample]
 	else:
-		output = subprocess.check_output(['das_client.py', '--query', "file dataset=" + sample + " | count(file.name)"])
-		for line in output.splitlines():
-			if "count(file.name)=" in line :
-				replacedline = line.replace("count(file.name)=","")
-		N = int(replacedline)
+		output = subprocess.check_output(['dasgoclient', '--query', "file dataset=" + sample])
+		#for line in output.splitlines():
+		#	if "count(file.name)=" in line :
+		#		replacedline = line.replace("count(file.name)=","")
+		N = int(len(output.splitlines()))
 		CACHED_DATASETS[sample] = N
 
 	minNFiles = 100
@@ -183,17 +183,17 @@ def submitJobs(MCBackgroundsSampleDictionary, SignalMCSampleDictionary, DataDict
 		ConfigFileName = createConfigFile(key, "mu", isMC=True, isSignal=False)
 		print key, " ", ConfigFileName
 		createFileForJob(key, "mu", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
-#		ConfigFileName = createConfigFile(key, "ele", isMC=True, isSignal=False)
-#		createFileForJob(key, "ele", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
+		ConfigFileName = createConfigFile(key, "ele", isMC=True, isSignal=False)
+		createFileForJob(key, "ele", MCBackgroundsSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, False, wantToSubmit)
 	for key in SignalMCSampleDictionary:
 		ConfigFileName = createConfigFile(key, "mu", isMC=True, isSignal=True)
 		createFileForJob(key, "mu", SignalMCSampleDictionary[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, True, True, wantToSubmit)
-#		ConfigFileName = createConfigFile(key, "ele", isMC=True, isSignal=True)
-#		createFileForJob(key, "ele", SignalMCSampleDictionary[key], options.Feature, ConfigFileName, "crabConfigs", JSONFile, YourRunRange, True, True, wantToSubmit)
-#	for key in DataDictionaryElectronChannel:
-#		runBtoF = not ("RunG" in key or "RunH" in key)
-#		ConfigFileName = createConfigFile(key, "ele", isMC=False, isSignal=False, runBtoF=runBtoF)
-#		createFileForJob(key, "ele", DataDictionaryElectronChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
+		ConfigFileName = createConfigFile(key, "ele", isMC=True, isSignal=True)
+		createFileForJob(key, "ele", SignalMCSampleDictionary[key], options.Feature, ConfigFileName, "crabConfigs", JSONFile, YourRunRange, True, True, wantToSubmit)
+	for key in DataDictionaryElectronChannel:
+		runBtoF = not ("RunG" in key or "RunH" in key)
+		ConfigFileName = createConfigFile(key, "ele", isMC=False, isSignal=False, runBtoF=runBtoF)
+		createFileForJob(key, "ele", DataDictionaryElectronChannel[key], options.Feature, ConfigFileName,  "crabConfigs",  JSONFile, YourRunRange, False, True, wantToSubmit)
 	for key in DataDictionaryMuonChannel:
 		runBtoF = not ("RunG" in key or "RunH" in key)
 		ConfigFileName = createConfigFile(key, "mu", isMC=False, isSignal=False, runBtoF=runBtoF)

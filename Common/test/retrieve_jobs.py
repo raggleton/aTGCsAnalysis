@@ -106,7 +106,7 @@ def Retrieval(feature, outDir):
 
 	for TaskName, OutName in TaskDictionaryName.items():
 		RetrieveTask(TaskName + "_mu_" + feature, OutName + "_mu", outDir)
-#		RetrieveTask(TaskName + "_ele_" + feature, OutName + "_ele", outDir )
+		RetrieveTask(TaskName + "_ele_" + feature, OutName + "_ele", outDir )
 
 if __name__ == '__main__':
 	Retrieval("my_feature", "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/" )

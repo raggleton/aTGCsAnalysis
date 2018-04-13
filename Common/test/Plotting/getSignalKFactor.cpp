@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 #include <algorithm> 
-#include <Sample.cpp> 
+#include "Sample.cpp"
 
 
 double getNEvents(Sample sample_, bool isSignal=false)
@@ -45,7 +45,7 @@ double getNEvents(Sample sample_, bool isSignal=false)
 
 void getSignalKFactor()
 {
-	string prefix = "/afs/cern.ch/work/i/ishvetso/aTGCRun2/samples_76X_18April2016/";
+	string prefix = "/afs/cern.ch/work/m/maiqbal/private/aTGC/Samples_80X_Working/";
 	Sample  SM, Signal;
 	std::string channel = "ele";
 	string defaulCuts = "(jet_pt > 200. && jet_tau2tau1 < 0.6  && ( Mjpruned < 105. && Mjpruned > 65.) && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0.";
