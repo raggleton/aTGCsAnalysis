@@ -709,10 +709,10 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(fatJetsToken_, jets);
 
    edm::Handle<edm::View<pat::Jet> > jetsSmearedUp;
-   iEvent.getByToken(fatJetsSmearedUpToken_, jetsSmearedUp);
+   if(isMC) iEvent.getByToken(fatJetsSmearedUpToken_, jetsSmearedUp);
 
    edm::Handle<edm::View<pat::Jet> > jetsSmearedDown;
-   iEvent.getByToken(fatJetsSmearedDownToken_, jetsSmearedDown);
+   if(isMC) iEvent.getByToken(fatJetsSmearedDownToken_, jetsSmearedDown);
 
    edm::Handle<edm::View<reco::GenJet>> genJetsAK8;
    if(isMC) iEvent.getByToken(genJetsAK8Token_, genJetsAK8);
