@@ -1262,8 +1262,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   NAK8jet = jets -> size();
-  NAK8jet_smearedUp = jetsSmearedUp -> size();
-  NAK8jet_smearedDown = jetsSmearedDown -> size();
+  if(isMC) NAK8jet_smearedUp = jetsSmearedUp -> size();
+  if(isMC) NAK8jet_smearedDown = jetsSmearedDown -> size();
   JetResolutionSmearer_.setRhoAndSeed(rho_, iEvent);
 
   // Different types because the pat::Jet returns math::XYZTLorentzVector (uses E not M)
