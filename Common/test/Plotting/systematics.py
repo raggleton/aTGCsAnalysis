@@ -39,11 +39,11 @@ def main(options):
 				if iProcess in k and iSyst in k and "Up" in k  :
 					obj = ROOT.gDirectory.GetKey(k).ReadObj()
 					upIntegral = obj.Integral()
-					UpUncertainty = (upIntegral - nominalIntegrals[iProcess])
+					UpUncertainty = abs(upIntegral - nominalIntegrals[iProcess])
 				elif iProcess in k  and iSyst in k and "Down" in k :
 					obj = ROOT.gDirectory.GetKey(k).ReadObj()
 					downIntegral = obj.Integral()
-					DownUncertainty = (downIntegral - nominalIntegrals[iProcess])
+					DownUncertainty = abs(downIntegral - nominalIntegrals[iProcess])
 				else :
 					continue
 			absUnc = 100*max(UpUncertainty, DownUncertainty)/nominalIntegrals[iProcess]
