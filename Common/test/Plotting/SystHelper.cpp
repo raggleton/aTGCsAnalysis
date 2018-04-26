@@ -31,7 +31,7 @@ SystHelper::SystHelper(std::string selection){
   VarsJEC.push_back("Mjpruned");
   VarsJEC.push_back("jet_mass_softdrop");
   VarsJEC.push_back("jet_mass");
-  VarsJEC.push_back("MWW");
+  VarsJEC.push_back("MWW_SD");
   VarsJEC.push_back("deltaPhi_LeptonMet");
   VarsJEC.push_back("deltaPhi_WJetMet");
   VarsJEC.push_back("deltaPhi_WJetWlep");
@@ -47,14 +47,14 @@ SystHelper::SystHelper(std::string selection){
   VarsLeptonEn.push_back("deltaPhi_LeptonMet");
   VarsLeptonEn.push_back("deltaPhi_WJetMet");
   VarsLeptonEn.push_back("deltaPhi_WJetWlep");
-  VarsLeptonEn.push_back("MWW");
+  VarsLeptonEn.push_back("MWW_SD");
 
   //lepton resolution
   VarsLeptonRes.push_back("l_pt");
   VarsLeptonRes.push_back("W_pt");
   VarsLeptonRes.push_back("W_mass");
   VarsLeptonRes.push_back("W_mt");
-  VarsLeptonRes.push_back("MWW");
+  VarsLeptonRes.push_back("MWW_SD");
 
   //MET
   VarsUnclEn.push_back("W_pt");
@@ -65,7 +65,7 @@ SystHelper::SystHelper(std::string selection){
   VarsUnclEn.push_back("deltaPhi_LeptonMet");
   VarsUnclEn.push_back("deltaPhi_WJetMet");
   VarsUnclEn.push_back("deltaPhi_WJetWlep");
-  VarsUnclEn.push_back("MWW");
+  VarsUnclEn.push_back("MWW_SD");
 
   //JER
   VarsJER.push_back("pfMET");
@@ -76,11 +76,11 @@ SystHelper::SystHelper(std::string selection){
   VarsJER.push_back("jet_mass");
   VarsJER.push_back("Mjpruned");
   VarsJER.push_back("jet_mass_softdrop");
-  VarsJER.push_back("MWW");
+  VarsJER.push_back("MWW_SD");
   VarsJER.push_back("jet_mass_softdrop_PUPPI");
 
   //JetRes, please merge JER and JetRes!
-  //VarsJetRes.push_back("MWW");
+  //VarsJetRes.push_back("MWW_SD");
 
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("JEC", VarsJEC));
   VariablesAffected.insert(std::pair<std::string, std::vector<std::string>>("LeptonEn", VarsLeptonEn));

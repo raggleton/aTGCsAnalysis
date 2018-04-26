@@ -35,7 +35,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	var.SetRange(0., 1.);
 	variables.push_back(var);
 
-	var.VarName = "MWW";
+	var.VarName = "MWW_SD";
 	var.Title = "m_{WV}";
 	var.SetRange(900., 4500.);
 	variables.push_back(var);
@@ -192,13 +192,13 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	else if (channel == "ele" )  p = Plotter(ELECTRON);
 	else exit(0);
 	vector <Sample> samples;
-	p.varToWrite = "MWW";
+	p.varToWrite = "MWW_SD";
 	p.SetVar(variables);
 	p.SetNbins(30);
 	p.setLumi(35922., 1.);
 
 	
-	string defaulCuts = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 150. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900.";
+	string defaulCuts = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 150. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900.";
 	if (channel == "ele") defaulCuts += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") defaulCuts += " && l_pt > 50. && pfMET > 40. )"; 
 	else {
@@ -208,7 +208,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	string addOnCutWjets = defaulCuts +  " * ( (jet_mass_softdrop_PUPPI  < 65. || jet_mass_softdrop_PUPPI > 105. ) && nbtag == 0) ";
         string addOnCutTtbar = defaulCuts +  " * (nbtag > 0 )";
 
-	string signalRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	string signalRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900. && nbtag == 0";
 	if (channel == "ele") signalRegion += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") signalRegion += " && l_pt > 50. && pfMET > 40. )"; 
 	else {
@@ -216,7 +216,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		exit(0);
 	}
 
-	string signalWWRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 85. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	string signalWWRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 85. && jet_mass_softdrop_PUPPI > 65. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900. && nbtag == 0";
 	if (channel == "ele") signalWWRegion += " && l_pt > 50. && pfMET > 80. )";
         else if (channel == "mu") signalWWRegion += " && l_pt > 50. && pfMET > 40. )";
         else {
@@ -224,7 +224,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
                 exit(0);
         }
 
-	string signalWZRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 85. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0";
+	string signalWZRegion = "(jet_pt > 200. && jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 105. && jet_mass_softdrop_PUPPI > 85. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900. && nbtag == 0";
 	if (channel == "ele") signalWZRegion += " && l_pt > 50. && pfMET > 80. )";
         else if (channel == "mu") signalWZRegion += " && l_pt > 50. && pfMET > 40. )";
         else {
@@ -232,7 +232,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
                 exit(0);
         }
 
-	string TTBarEnrichedInclusive = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. ";
+	string TTBarEnrichedInclusive = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900. ";
 	if (channel == "ele") TTBarEnrichedInclusive += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") TTBarEnrichedInclusive += " && l_pt > 50. && pfMET > 40. )"; 
 	else {
@@ -240,7 +240,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 		exit(0);
 	}
 
-	string TTBarEnrichedBTagVeto = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW > 900. && nbtag == 0 ";
+	string TTBarEnrichedBTagVeto = "(jet_pt > 200.  &&  jet_tau21_PUPPI < 0.55  && jet_mass_softdrop_PUPPI < 200. && jet_mass_softdrop_PUPPI > 40. && W_pt > 200.  && abs(deltaR_LeptonWJet) > pi/2. && abs(deltaPhi_WJetMet) > 2. && abs(deltaPhi_WJetWlep) > 2. && MWW_SD > 900. && nbtag == 0 ";
 	if (channel == "ele") TTBarEnrichedBTagVeto += " && l_pt > 50. && pfMET > 80. )"; 
 	else if (channel == "mu") TTBarEnrichedBTagVeto += " && l_pt > 50. && pfMET > 40. )"; 
 	else {

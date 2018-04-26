@@ -16,8 +16,8 @@ def main(options):
 	for k in keyList:
 		obj = ROOT.gDirectory.GetKey(k).ReadObj()
 		if "Up" not in k and "Down" not in k:
-			nominalIntegrals[k.replace("_MWW","")]=obj.Integral()
-			processName = k.replace("_MWW","")
+			nominalIntegrals[k.replace("_MWW_SD","")]=obj.Integral()
+			processName = k.replace("_MWW_SD","")
 		if "Up" in k:
 			ListOfSystematics.append(k.replace(processName+"_","").replace("Up",""))
 
@@ -39,11 +39,11 @@ def main(options):
 				if iProcess in k and iSyst in k and "Up" in k  :
 					obj = ROOT.gDirectory.GetKey(k).ReadObj()
 					upIntegral = obj.Integral()
-					UpUncertainty = abs(upIntegral - nominalIntegrals[iProcess])
+					UpUncertainty = (upIntegral - nominalIntegrals[iProcess])
 				elif iProcess in k  and iSyst in k and "Down" in k :
 					obj = ROOT.gDirectory.GetKey(k).ReadObj()
 					downIntegral = obj.Integral()
-					DownUncertainty = abs(downIntegral - nominalIntegrals[iProcess])
+					DownUncertainty = (downIntegral - nominalIntegrals[iProcess])
 				else :
 					continue
 			absUnc = 100*max(UpUncertainty, DownUncertainty)/nominalIntegrals[iProcess]
