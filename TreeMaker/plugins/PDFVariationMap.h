@@ -21,8 +21,8 @@ extern const std::map<int, range> PDFVariationMap = {
 	{260000, range(2001,2100)},
         // We make a new convention about signal range since new signal samples have the same nominal values but different ranges.
         // Use nominal value/100 for signal to distinguish it in the LUT from others.
-        {292000/100, range(1011,1110)},
-	{292200/100, range(1011,1110)}
+        {292000/100, range(1010,1109)},
+	{292200/100, range(1010,1109)}
 };
 
 #endif
