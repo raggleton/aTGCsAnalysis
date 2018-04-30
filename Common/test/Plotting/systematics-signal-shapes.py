@@ -42,7 +42,7 @@ def SetSystematicsFromFile(file_, histNominal_, ListOfSystematics_):
 
 
 
-def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,binhi=4500):
+def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,binhi=3000):
 
 	if cat == 'WW':
 		sigreg 	= 'lo'
@@ -78,7 +78,7 @@ def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,bi
 	
 	##read workspace containing background pdfs
 	#fileInWs	= TFile.Open('Input/wwlvj_%s_HPW_workspace.root'%ch[:2])
-	rrv_mass_lvj = RooRealVar('rrv_mass_lvj','rrv_mass_lvj',1000,binlo,binhi)
+	rrv_mass_lvj = RooRealVar('rrv_mass_lvj','rrv_mass_lvj',2000,binlo,binhi)
 	#w		= fileInWs.Get('workspace4limit_')
 	#rrv_mass_lvj	= w.var('rrv_mass_lvj')
 	rrv_mass_lvj.SetTitle('M_{WV}')
@@ -164,9 +164,9 @@ def getSignalParmeters(cat, SMhist, pos_hists, neg_hists, ch = 'el',binlo=900,bi
 	VocabularyWithResults = {}
 	for i in range(3):
 		wtmp.var(POI[0]).setVal(0); wtmp.var(POI[1]).setVal(0); wtmp.var(POI[2]).setVal(0);
-		wtmp.var(POI[i]).setVal(-par_max[POI[i]])
+		wtmp.var(POI[i]).setVal(par_max[POI[i]])
 		wtmp.var('a_quad_%s_%s_%s'%(POI[i],cat,ch)).setConstant(kFALSE)
-		fitres		= model.fitTo(wtmp.data('neg_datahist_%s'%POI[i]),RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE))
+		fitres		= model.fitTo(wtmp.data('pos_datahist_%s'%POI[i]),RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE))
 		fitresults.append(fitres)
 		wtmp.var('a_quad_%s_%s_%s'%(POI[i],cat,ch)).setConstant(kTRUE)
 
@@ -232,6 +232,7 @@ def main(options):
 		
 	#get nominal values
 	NominalValues = getSignalParmeters(options.cat, SMhist, pos_hists, neg_hists, options.ch)
+	#raw_input("Nominal Values")
 	#get values for systematics
 	for iSyst in ListOfSystematics:
 		#start with Up variation
@@ -241,13 +242,17 @@ def main(options):
 			neg_hists[para] = fileWithHists.Get('signalNegative_%s'%para+"_" + iSyst + "Up")
 
 		VocabularyForSystematicsUp[iSyst] = getSignalParmeters(options.cat, SMhist, pos_hists, neg_hists, options.ch)
+		#print iSyst
+		#raw_input("Up")
 		
 
-		SMhist = fileWithHists.Get("SMhist_"+iSyst + "Up")
+		SMhist = fileWithHists.Get("SMhist_"+iSyst + "Down")
 		for para in POI:
 			pos_hists[para] = fileWithHists.Get('signalPositive_%s'%para+"_" + iSyst + "Down")
 			neg_hists[para] = fileWithHists.Get('signalNegative_%s'%para+"_" + iSyst + "Down")
-		VocabularyForSystematicsDown[iSyst] = getSignalParmeters(options.cat, SMhist, pos_hists, neg_hists, options.ch)	
+		VocabularyForSystematicsDown[iSyst] = getSignalParmeters(options.cat, SMhist, pos_hists, neg_hists, options.ch)
+		#print iSyst
+		#raw_input("Down")
 
 	for iSyst in VocabularyForSystematicsUp:
 		for iATGC in VocabularyForSystematicsUp[iSyst]:
@@ -271,8 +276,8 @@ def main(options):
 	canvas.SetLogy()
 
 	low = 900.
-	high = 4500.
-	step = (high - low)/1000
+	high = 3000.
+	step = (high - low)/100
 	for iATGC in POI:
 		legend = TLegend(0.7,0.7,0.9,0.8)
 		legend.SetFillColor(kWhite)
