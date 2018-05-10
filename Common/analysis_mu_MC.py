@@ -123,7 +123,20 @@ process.DecayChannel = cms.EDAnalyzer("DecayChannelAnalyzer")
 process.metSequenceSystematics = CreateWLepWithSystematicsSequence(process, "mu")
 
 # PATH
-process.analysis = cms.Path(process.GenWeights + process.NoiseFilters  + process.BadChargedCandidateFilter  + process.BadPFMuonFilter + process.fullPatMetSequence + process.METmu +  process.egmGsfElectronIDSequence +  process.leptonSequence +   process.jetSequence + process.metSequenceSystematics +  process.treeDumper)
+process.analysis = cms.Path(
+    process.GenWeights +
+    process.NoiseFilters +
+    process.BadChargedCandidateFilter +
+    process.BadPFMuonFilter +
+    process.egmGsfElectronIDSequence +
+    process.leptonSequence +
+    process.fullPatMetSequence +
+    process.METmu +
+    process.Wtomunu +
+    process.jetSequence +
+    process.metSequenceSystematics +
+    process.treeDumper
+)
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
