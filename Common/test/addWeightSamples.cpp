@@ -130,10 +130,10 @@ void addWeightSamples()
   addWeight(prefix + "ttbar_ele.root", 831.76, lumi, "ele");
 
   // The cross sections are from the GenXSecAnalyzer and multiplying factors are required to match the SM yield to the SM samples.
-  addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", 0.1833 * 3.5, lumi, "ele");
-  addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", 0.2366 * 2.818, lumi, "ele");
-  addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", 0.06493 * 13.57, lumi, "ele");
-  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", 0.1012 * 9.09, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-600To800_ele.root", 0.1833 * 2.544, lumi, "ele");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_ele.root", 0.2366 * 1.375, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_ele.root", 0.06493 * 7.160, lumi, "ele");
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_ele.root", 0.1012 * 3.819, lumi, "ele");
 
 
   //muon channel
@@ -154,9 +154,9 @@ void addWeightSamples()
   addWeight(prefix + "ttbar_mu.root", 831.76, lumi,"");
 
   // The cross sections are from the GenXSecAnalyzer and multiplying factors are required to match the SM yield to the SM samples.
-  addWeight(prefix + "WW-aTGC_MWW-600To800_mu.root", 0.1833 * 3.78, lumi, "");
-  addWeight(prefix + "WW-aTGC_MWW-800ToInf_mu.root", 0.2366 * 3.188, lumi, "");
-  addWeight(prefix + "WZ-aTGC_MWZ-600To800_mu.root", 0.06493 * 15.64, lumi, "");  
-  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root", 0.1012 * 9.98, lumi, "");
+  addWeight(prefix + "WW-aTGC_MWW-600To800_mu.root", 0.1833 * 2.759, lumi, "");
+  addWeight(prefix + "WW-aTGC_MWW-800ToInf_mu.root", 0.2366 * 1.535, lumi, "");
+  addWeight(prefix + "WZ-aTGC_MWZ-600To800_mu.root", 0.06493 * 8.732, lumi, "");  
+  addWeight(prefix + "WZ-aTGC_MWZ-800ToInf_mu.root", 0.1012 * 4.341, lumi, "");
 
 }
