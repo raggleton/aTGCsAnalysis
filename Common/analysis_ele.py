@@ -104,6 +104,8 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     isMC = cms.bool(False),
                                     BtagEffFile = cms.string(""),
                                     BtagDiscrCut = cms.double(0.9535),
+                                    BtagDiscrCutMedium = cms.double(0.8484),
+                                    BtagDiscrCutLoose = cms.double(0.5426),
                                     isSignal = cms.bool(False),
                                     channel = cms.string("el")
                                     )

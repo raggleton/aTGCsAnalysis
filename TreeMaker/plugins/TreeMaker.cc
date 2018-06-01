@@ -143,7 +143,7 @@ private:
   // Jet quantities
   int NAK8jet, NAK8jet_smearedUp, NAK8jet_smearedDown, NAK8jet_JECUp, NAK8jet_JECDown;
   int njets, njets_JERUp, njets_JERDown, njets_JECUp, njets_JECDown;
-  int nbtag, nbtag_JERUp, nbtag_JERDown, nbtag_JECUp, nbtag_JECDown;
+  int nbtag, nbtagMedium, nbtagLoose, nbtag_JERUp, nbtag_JERDown, nbtag_JECUp, nbtag_JECDown;
 
   double jet_pt, jet_eta, jet_phi, jet_mass, jet_mass_pruned, jet_mass_softdrop, jet_tau2tau1, jet_tau3tau2, jet_tau1, jet_tau2, jet_tau3;
   //PUPPI variables 
@@ -229,7 +229,7 @@ private:
   // For PUPPI Softdrop Mass Correction
   TF1 *puppisd_corrGEN, *puppisd_corrRECO_cen, *puppisd_corrRECO_for;
   JetCorrectionUncertainty * jecUnc;
-  double bTagDiscrCut;
+  double bTagDiscrCut, bTagDiscrCutMedium, bTagDiscrCutLoose;
 };
 
 //
@@ -266,7 +266,9 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   ),
   JetResolutionSmearer_(iConfig.getParameter<bool>("isMC")),
   BTagHelper_(iConfig.getParameter<std::string>("BtagEffFile"), iConfig.getParameter<double>("BtagDiscrCut")),
-  bTagDiscrCut(iConfig.getParameter<double>("BtagDiscrCut"))
+  bTagDiscrCut(iConfig.getParameter<double>("BtagDiscrCut")),
+  bTagDiscrCutMedium(iConfig.getParameter<double>("BtagDiscrCutMedium")),
+  bTagDiscrCutLoose(iConfig.getParameter<double>("BtagDiscrCutLoose"))
 {
 
   if ((channel != "mu") && (channel != "el")) {
@@ -609,6 +611,8 @@ TreeMaker::TreeMaker(const edm::ParameterSet& iConfig):
   }
   outTree_->Branch("njets",         &njets,           "njets/I"   );
   outTree_->Branch("nbtag",         &nbtag,           "nbtag/I"   );
+  outTree_->Branch("nbtagMedium",         &nbtagMedium,           "nbtagMedium/I"   );
+  outTree_->Branch("nbtagLoose",         &nbtagLoose,           "nbtagLoose/I"   );
 
   if (isMC) {
     outTree_->Branch("njets_JERUp",         &njets_JERUp,           "njets_JERUp/I"   );
@@ -1433,6 +1437,8 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   // Count number of btagged AK4 jets
   nbtag = 0;
+  nbtagMedium = 0;
+  nbtagLoose = 0;
   nbtag_JECUp = 0;
   nbtag_JECDown = 0;
   nbtag_JERUp = 0;
@@ -1442,6 +1448,12 @@ TreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //taken from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X#Supported_Algorithms_and_Operati
     if((itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCut){
       nbtag ++;
+    }
+    if((itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCutMedium){
+      nbtagMedium ++;
+    }
+    if((itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")) > bTagDiscrCutLoose){
+      nbtagLoose ++;
     }
     // std::cout << "Nominal " << itr.pt() << " : " << itr.eta() << " : " << itr.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") << std::endl;
     if(isMC) jetFlavours.push_back(itr.partonFlavour());

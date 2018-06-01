@@ -111,7 +111,9 @@ process.treeDumper = cms.EDAnalyzer("TreeMaker",
                                     isMC = cms.bool(True),
                                     BtagEffFile = cms.string(""),
                                     BtagDiscrCut = cms.double(0.9535),
-				                    isSignal = cms.bool(False),
+                                    BtagDiscrCutMedium = cms.double(0.8484),
+                                    BtagDiscrCutLoose = cms.double(0.5426),
+				    isSignal = cms.bool(False),
                                     channel = cms.string("mu"),
                                     VTagSF = cms.double(1.03),
                                     )
@@ -140,7 +142,7 @@ process.analysis = cms.Path(
 
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/WW_mu.root'),
+    fileNames = cms.untracked.vstring('file:///afs/cern.ch/work/m/maiqbal/private/aTGC/TestSamples/ttbar_mu.root'),
 )
 
 
