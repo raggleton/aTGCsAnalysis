@@ -42,6 +42,10 @@ enum CHANNEL {
 	ELECTRON,	MUON
 };
 
+enum CR {
+	DEFAULT,	WJETS,	TTBAR
+};
+
 class Plotter
 {
    	int Nbins;
@@ -52,6 +56,7 @@ class Plotter
 	std::map<std::pair<std::string, std::string>, Var*> SystematicsVarMapUp, SystematicsVarMapDown;
 
 	public:
+	CR contReg = DEFAULT;
 	TFile *fileToWriteHists;
 	TFile *fileToWriteHistsSignal;
 	std::string varToWrite;

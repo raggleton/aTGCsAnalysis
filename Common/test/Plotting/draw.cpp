@@ -191,6 +191,8 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	if (channel == "mu")p = Plotter(MUON);
 	else if (channel == "ele" )  p = Plotter(ELECTRON);
 	else exit(0);
+	if (region == "WJets") p.contReg = WJETS;
+	else if (region == "ttbar") p.contReg = TTBAR;
 	vector <Sample> samples;
 	p.varToWrite = "MWW_SD";
 	p.SetVar(variables);

@@ -818,12 +818,16 @@ void Plotter::Plotting(std::string OutPrefix_)
     }
     c1 -> cd();
     
-    TPaveText *pt = new TPaveText(0.15,0.83,0.35,0.93, "blNDC");
+    TPaveText *pt = new TPaveText(0.15,0.82,0.35,0.90, "blNDC");
     pt -> SetFillStyle(0);
     pt -> SetBorderSize(0);
+    pt -> SetTextAlign(12);
     if (channel == ELECTRON) pt -> AddText("Electron channel");
     else if (channel == MUON) pt -> AddText("Muon channel");
     else std::cerr << "no channel set..." << std::endl;
+    if (contReg == WJETS) pt -> AddText("W+Jets control region");
+    else if (contReg == TTBAR) pt -> AddText("ttbar control region");
+    else pt -> AddText("Signal region");
     pt -> Draw("SAME");
     
     pad1 -> SetTopMargin(0.07);
