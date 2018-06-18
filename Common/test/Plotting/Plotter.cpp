@@ -759,7 +759,8 @@ void Plotter::Plotting(std::string OutPrefix_)
       signalHist[vname] -> SetLineWidth(2.);
     }
 
-    for (uint process_i = 0; process_i < samples.size() && withMC; process_i++){
+    // Stack needs to be filled in the opposite order to draw first on top and so on
+    for (int process_i = samples.size()-1; process_i >=0 && withMC; process_i--){
       std::string process = samples[process_i].Processname;
       std::pair<std::string,std::string> key(vname,process);
 
@@ -770,6 +771,11 @@ void Plotter::Plotting(std::string OutPrefix_)
       //hist_per_process[key] -> GetYaxis() -> SetRangeUser(0.1, (hist_per_process[key] -> GetMaximum())*1.5);
       hist_per_process[key] -> SetLineColor(kBlack);
       hist_per_process[key] -> SetLineWidth(1.);
+    }
+    // Legend in correct order gives first on top and so on
+    for (uint process_i = 0; process_i < samples.size() && withMC; process_i++){
+      std::string process = samples[process_i].Processname;
+      std::pair<std::string,std::string> key(vname,process);
       leg[vname]->AddEntry(hist_per_process[key], (samples.at(process_i).Processname).c_str(),"f");
     }
   }

@@ -310,6 +310,15 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	samples.push_back(s);
 	s.ReSet();
 
+	s.SetParameters("Single top", MCSelection, kBlue);
+        s.SetFileNames(prefix + "tW-ch-top_" + channel + ".root");
+        s.SetFileNames(prefix + "tW-ch-antitop_" + channel + ".root");
+        s.SetFileNames(prefix + "t-ch-top_" + channel + ".root");
+        s.SetFileNames(prefix + "t-ch-antitop_" + channel + ".root");
+        s.SetFileNames(prefix + "s-ch_" + channel + ".root");
+        samples.push_back(s);
+        s.ReSet();
+
 	s.SetParameters("W+jets", MCSelection, kGreen);
  	s.SetFileNames(prefix + "WJets_Ht100To200_" + channel + ".root");
  	s.SetFileNames(prefix + "WJets_Ht200To400_" + channel + ".root");
@@ -330,15 +339,6 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 
 	s.SetParameters("ttbar", MCSelection, kOrange);
  	s.SetFileNames(prefix + "ttbar_" + channel + ".root");
-	samples.push_back(s);
-	s.ReSet();
-
-	s.SetParameters("Single Top", MCSelection, kBlue);
- 	s.SetFileNames(prefix + "tW-ch-top_" + channel + ".root");
- 	s.SetFileNames(prefix + "tW-ch-antitop_" + channel + ".root");
- 	s.SetFileNames(prefix + "t-ch-top_" + channel + ".root");
- 	s.SetFileNames(prefix + "t-ch-antitop_" + channel + ".root");
- 	s.SetFileNames(prefix + "s-ch_" + channel + ".root");
 	samples.push_back(s);
 	s.ReSet();
 
