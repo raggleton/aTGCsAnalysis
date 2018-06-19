@@ -831,8 +831,8 @@ void Plotter::Plotting(std::string OutPrefix_)
     if (channel == ELECTRON) pt -> AddText("Electron channel");
     else if (channel == MUON) pt -> AddText("Muon channel");
     else std::cerr << "no channel set..." << std::endl;
-    if (contReg == WJETS) pt -> AddText("W+Jets control region");
-    else if (contReg == TTBAR) pt -> AddText("ttbar control region");
+    if (contReg == WJETS) pt -> AddText("W+jets control region");
+    else if (contReg == TTBAR) pt -> AddText("t#bar{t} control region");
     else pt -> AddText("Signal region");
     pt -> Draw("SAME");
     
