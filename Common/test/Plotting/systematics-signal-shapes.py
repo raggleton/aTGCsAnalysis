@@ -276,7 +276,7 @@ def main(options):
 	canvas.SetLogy()
 
 	low = 900.
-	high = 3000.
+	high = 4500.
 	step = (high - low)/100
 	for iATGC in POI:
 		legend = TLegend(0.7,0.7,0.9,0.8)
@@ -299,7 +299,7 @@ def main(options):
 		iMass = 0
 		graph = TGraphAsymmErrors()
 		sum_ = 0.
-		while mass <= high:
+		while mass <= 3000:
 			graph.SetPoint(iMass, mass, pow(integral,-1)*math.exp(NominalValues["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch]*mass))
 			graph.SetPointEYlow(iMass,  abs(pow(integral,-1)*math.exp(NominalValues["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch]*mass)  - pow(integralDown,-1)*math.exp((NominalValues["a_quad_"+ iATGC + "_"+ options.cat +"_"+ options.ch] - UncertaintiesDown["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch])*mass )))
 			graph.SetPointEYhigh(iMass,  abs(pow(integral,-1)*math.exp(NominalValues["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch]*mass)  - pow(integralUp,-1)*math.exp((NominalValues["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch] + UncertaintiesUp["a_quad_"+ iATGC +"_"+ options.cat +"_"+ options.ch])*mass )))
@@ -309,12 +309,15 @@ def main(options):
 		graph.SetFillStyle(3010)
 		graph.GetXaxis().SetTitle("m_{WV}")
 		graph.GetYaxis().SetTitle("arb. units")
-		graph.GetYaxis().SetRangeUser(1e-6,1e-2)
+		graph.GetYaxis().SetRangeUser(7e-5,1.5e-3)
 		graph.SetLineWidth(4)
 		graph.SetLineColor(kRed)
 		legend.AddEntry(graph, iATGC,"l")
 		graph.Draw("AL3")
-		hist_ = fileWithHists.Get('signalNegative_%s'%iATGC) 
+		hist_ = fileWithHists.Get('signalPositive_%s'%iATGC)
+		hist_.Scale(0.5)
+		histNeg_ = fileWithHists.Get('signalNegative_%s'%iATGC)
+		hist_.Add(histNeg_,0.5)
 		hist_.SetLineWidth(4)
 		hist_.SetLineColor(kBlue)
 		SetSystematicsFromFile(fileWithHists,hist_, ListOfSystematics)
@@ -322,7 +325,8 @@ def main(options):
 		hist_.Scale(1/hist_.Integral("width"))
 		graphMC = TGraph()
 		for iBin in range(1, hist_.GetNbinsX()+1):
-			graphMC.SetPoint(iBin, hist_.GetBinCenter(iBin),hist_.GetBinContent(iBin) )
+			if(hist_.GetBinCenter(iBin)<=3000):
+				graphMC.SetPoint(iBin, hist_.GetBinCenter(iBin),hist_.GetBinContent(iBin) )
 		graphMC.SetMarkerColor(kBlue)
 		legend.AddEntry(graphMC, "MC", "p")		
 		graphMC.Draw("PSAME")
