@@ -337,7 +337,7 @@ void draw(std::string channel, std::string region, std::string tag, string prefi
 	samples.push_back(s);
 	s.ReSet();
 
-	s.SetParameters("ttbar", MCSelection, kOrange);
+	s.SetParameters("t#bar{t}", MCSelection, kOrange);
  	s.SetFileNames(prefix + "ttbar_" + channel + ".root");
 	samples.push_back(s);
 	s.ReSet();

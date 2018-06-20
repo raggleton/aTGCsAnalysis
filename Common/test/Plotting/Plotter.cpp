@@ -824,10 +824,11 @@ void Plotter::Plotting(std::string OutPrefix_)
     }
     c1 -> cd();
     
-    TPaveText *pt = new TPaveText(0.15,0.82,0.35,0.90, "blNDC");
+    TPaveText *pt = new TPaveText(0.15,0.82,0.5,0.90, "blNDC");
     pt -> SetFillStyle(0);
     pt -> SetBorderSize(0);
     pt -> SetTextAlign(12);
+    pt -> SetTextSize(0.035);
     if (channel == ELECTRON) pt -> AddText("Electron channel");
     else if (channel == MUON) pt -> AddText("Muon channel");
     else std::cerr << "no channel set..." << std::endl;
