@@ -279,7 +279,7 @@ def main(options):
 	high = 4500.
 	step = (high - low)/100
 	for iATGC in POI:
-		legend = TLegend(0.7,0.7,0.9,0.8)
+		legend = TLegend(0.65,0.6,0.9,0.75)
 		legend.SetFillColor(kWhite)
 		if options.ch == "ele":
 			legend.SetHeader(options.cat + " , electron channel")
@@ -312,7 +312,12 @@ def main(options):
 		graph.GetYaxis().SetRangeUser(7e-5,1.5e-3)
 		graph.SetLineWidth(4)
 		graph.SetLineColor(kRed)
-		legend.AddEntry(graph, iATGC,"l")
+		if iATGC=='cwww':
+			legend.AddEntry(graph, "#frac{c_{WWW}}{#Lambda^{2}}","l")
+		elif iATGC=='ccw':
+			legend.AddEntry(graph, "#frac{c_{W}}{#Lambda^{2}}","l")
+		elif iATGC=='cb':
+                        legend.AddEntry(graph, "#frac{c_{B}}{#Lambda^{2}}","l")
 		graph.Draw("AL3")
 		hist_ = fileWithHists.Get('signalPositive_%s'%iATGC)
 		hist_.Scale(0.5)
