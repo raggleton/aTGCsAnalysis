@@ -14,7 +14,7 @@ Usage:
 import ROOT
 import sys
 import os
-
+from __future__ import print_function
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(1)
